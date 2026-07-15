@@ -118,56 +118,218 @@ const MODULES = [
     icon: "⚙️",
     name: "RFQ Configuration Management",
     short: "Opportunity creation, NEP auto-numbering, feasibility, dynamic fields, supplier inputs",
-    desc: "The heart of the pre-sales engine — every RFQ becomes a structured opportunity with automatic NEP numbering, controlled documents, engineering feasibility and supplier inputs, all in one governed workspace.",
-    steps: [
+    desc: "The second-largest module of the solution — the complete RFQ engine, organised into 7 sub-modules. Each sub-module has its own execution cycle, from RFQ registration and process-level definition through feasibility, supplier inputs and approvals, up to versioned PDF generation.",
+    steps: [],
+    submodules: [
       {
-        icon: "💼", phase: "Initiate",
-        title: "Opportunity Creation",
-        text: "Each customer RFQ is registered as an opportunity — part details, volumes, target dates and commercial expectations captured in a structured form.",
-        features: ["RFQ registration form", "Part & annual volume capture", "Target timeline tracking", "Link to originating lead & account"],
-        outcome: "Every RFQ visible and measurable in one pipeline."
+        id: 1, icon: "📝",
+        name: "RFQ Registration",
+        short: "Opportunity / RFQ creation by Marketing with dynamic process levels",
+        cycle: [
+          {
+            icon: "💼", actor: "Marketing User",
+            title: "Create the RFQ / Opportunity",
+            text: "The Marketing user creates the RFQ as an Opportunity in Salesforce and defines the process levels of the product."
+          },
+          {
+            icon: "🎚️", actor: "Marketing User",
+            title: "Define the 6 Default Process Levels",
+            text: "The Opportunity carries six default Level dropdown fields. Every dropdown offers the same set of manufacturing process options:",
+            chips: ["Injection Moulding", "Painting", "Plating", "Assembly", "Pad/Screen/Laser Printing", "Pad/Screen Printing", "Vacuum Metallizing (PVD)", "Hot Stamping", "Film Forming/Trimming", "Film Printing", "Aluminium Anodising", "3D Flexible Badge"]
+          },
+          {
+            icon: "➕", actor: "Marketing User",
+            title: "Add Level — Dynamic Expansion",
+            text: "If the product needs more than six processes, the user clicks the 'Add Level' button and additional level dropdowns are added dynamically."
+          },
+          {
+            icon: "🔃", actor: "Marketing User",
+            title: "Re-Sequence Levels by Drag & Drop",
+            text: "The user can change the sequence of the levels simply by dragging them — for example, if Level 2 is Painting and Level 3 is Plating, dragging one over the other swaps their positions instantly.",
+            chips: ["Drag & drop re-ordering", "Example: Level 2 Painting ⇄ Level 3 Plating", "Sequence saved on the Opportunity"]
+          },
+          {
+            icon: "🛤️", actor: "System",
+            title: "Workflow Routes by Selected Levels",
+            text: "The RFQ workflow proceeds based on the selected process levels and their sequence — every downstream screen adapts to the levels chosen here."
+          }
+        ]
       },
       {
-        icon: "🔢", phase: "Identify",
-        title: "NEP Auto-Numbering",
-        text: "The system generates the NEP (New Enquiry / Project) number automatically using your numbering logic — unique, sequential and audit-proof.",
-        features: ["Configurable numbering scheme", "Zero manual numbering errors", "NEP number as single reference", "Traceability across all modules"],
-        outcome: "One unique NEP number follows the project from RFQ to invoice."
+        id: 2, icon: "📄",
+        name: "Product Requirement",
+        short: "Customer requirement capture, AI-powered summary and auto-update of the Opportunity",
+        cycle: [
+          {
+            icon: "📥", actor: "Marketing User",
+            title: "Receive Customer Requirements",
+            text: "The Marketing user receives the customer's product requirements along with the relevant product documents."
+          },
+          {
+            icon: "📤", actor: "Marketing User",
+            title: "Upload Documents to Salesforce",
+            text: "The Marketing team user uploads all requirement documents to Salesforce using the document uploader — everything stored against the Opportunity."
+          },
+          {
+            icon: "🤖", actor: "AI Agent",
+            title: "AI Reads the Customer Input",
+            text: "An AI agent processes the uploaded customer input, extracts the relevant information and builds a summary — which is displayed directly on the Opportunity.",
+            chips: ["Automatic document reading", "Relevant information extraction", "AI summary shown on the Opportunity"]
+          },
+          {
+            icon: "✍️", actor: "AI Agent",
+            title: "Product Information Auto-Captured",
+            text: "The product information found in the customer input is also captured and updated straight into the Opportunity record — no manual re-typing by the Marketing team."
+          }
+        ]
       },
       {
-        icon: "📁", phase: "Control",
-        title: "Document Management",
-        text: "Drawings, specifications and customer documents are versioned and attached to the RFQ — with controlled access and revision history.",
-        features: ["Drawing & spec attachments", "Version / revision control", "Access-controlled documents", "Document checklist per RFQ"],
-        outcome: "The right revision of the right document — always."
+        id: 3, icon: "🖥️",
+        name: "Polyplastics Server Integration",
+        short: "CAD upload to the Polyplastics Server via API with public link on the Opportunity",
+        cycle: [
+          {
+            icon: "📐", actor: "Marketing User",
+            title: "Upload CAD via Salesforce",
+            text: "The user uploads the CAD file to the Polyplastics Server using Salesforce — the transfer happens through an API integration."
+          },
+          {
+            icon: "🔗", actor: "System",
+            title: "Public Link Generated",
+            text: "Once the upload completes, a public link to the file is generated and automatically updated on the Opportunity.",
+            chips: ["API-based upload", "Auto-generated public link", "Link stored on the Opportunity"]
+          },
+          {
+            icon: "🚀", actor: "Marketing User",
+            title: "'Send for Product Feasibility'",
+            text: "With the CAD uploaded and all required information entered, the user clicks 'Send for Product Feasibility' — a notification goes to the Product Feasibility team and its associated members."
+          }
+        ]
       },
       {
-        icon: "🧪", phase: "Evaluate",
-        title: "Product Feasibility",
-        text: "Engineering assesses whether the part can be manufactured — material, geometry, tolerance and process capability — with a formal feasibility sign-off.",
-        features: ["Feasibility questionnaire", "Cross-functional review", "Risk flags & assumptions", "Feasibility verdict & sign-off"],
-        outcome: "Commit only to what the plant can actually build."
+        id: 4, icon: "🧪",
+        name: "Product Feasibility",
+        short: "Engineering cross-verification of customer input and process levels",
+        cycle: [
+          {
+            icon: "🔔", actor: "Engineering Team",
+            title: "Notification Received — Review Customer Input",
+            text: "The Engineering team receives the notification and reviews the customer input in detail against the Opportunity."
+          },
+          {
+            icon: "🧩", actor: "System",
+            title: "Level-Dependent Parameters Appear",
+            text: "Based on the process levels selected at registration, multiple dependent parameters are displayed — only the fields relevant to those processes."
+          },
+          {
+            icon: "🔍", actor: "Engineering Team",
+            title: "Cross-Verify the Opportunity Levels",
+            text: "Engineering cross-verifies the levels of the Opportunity against the actual product. If anything is not relevant to the product, they connect with the customer and get the requirement changed.",
+            branches: [
+              { type: "no", label: "Mismatch Found", text: "Engineering connects with the customer, the requirement is corrected, and the Opportunity is updated." },
+              { type: "ok", label: "Everything Relevant", text: "Technical fields are completed per the product specifications — ready to send to the supplier." }
+            ]
+          },
+          {
+            icon: "📨", actor: "Engineering Team",
+            title: "Send Information to Supplier",
+            text: "With the requirement verified and feasibility data complete, the information is sent onward to the supplier (Sub-Module 3.5)."
+          }
+        ]
       },
       {
-        icon: "🛠️", phase: "Evaluate",
-        title: "Tooling Feasibility",
-        text: "Parallel tooling assessment — mould concept, cavitation, tool life and investment — so the tooling story is clear before costing begins.",
-        features: ["Tool concept & cavitation study", "Tool life & investment estimate", "Make-vs-buy input", "Tooling risk assessment"],
-        outcome: "Tooling cost and risk known before quoting."
+        id: 5, icon: "🤝",
+        name: "Supplier Inputs",
+        short: "Three-tab supplier screen, dynamic link email and tooling cost submission",
+        cycle: [
+          {
+            icon: "🖥️", actor: "Engineering Team",
+            title: "'Send to Supplier' — 3-Tab Screen Opens",
+            text: "The Engineering team clicks the 'Send to Supplier' button and a screen opens with three tabs of information for the supplier package.",
+            chips: ["Tab 1 · Product Tooling Information", "Tab 2 · Product Information", "Tab 3 · Product Picture"]
+          },
+          {
+            icon: "🧾", actor: "Tab 1", actorIcon: "🗂️",
+            title: "Product Tooling Information",
+            text: "A tooling table with columns for the List of Tooling name, Quantity and Unit Cost — the Total Cost is auto-calculated as Quantity × Unit Cost. In this tab, the supplier fills only the Unit Cost.",
+            chips: ["Tooling Name", "Quantity", "Unit Cost — supplier entry only", "Total Cost = Qty × Unit Cost (auto)"]
+          },
+          {
+            icon: "📋", actor: "Tab 2", actorIcon: "🗂️",
+            title: "Product Information",
+            text: "The product information tab is editable by all users except the supplier — the supplier can view it but cannot change anything, including the quantity."
+          },
+          {
+            icon: "🖼️", actor: "Tab 3", actorIcon: "🗂️",
+            title: "Product Picture",
+            text: "The third tab displays the product picture, giving the supplier full visual context of the part."
+          },
+          {
+            icon: "✉️", actor: "Engineering Team",
+            title: "Send — Email with Dynamic Link",
+            text: "When the Engineering team user sends this information, the supplier receives an email with a dynamic link attached that opens the supplier screen."
+          },
+          {
+            icon: "💵", actor: "Supplier",
+            title: "Supplier Fills Unit Price & Submits",
+            text: "The supplier opens the link, fills in the Unit Price and submits the tooling cost.",
+            branches: [
+              { type: "ok", label: "On Submission", text: "A notification is sent to the Associate Engineering user and Ravi Sir." }
+            ]
+          }
+        ]
       },
       {
-        icon: "🧩", phase: "Configure",
-        title: "Dynamic Process Fields",
-        text: "The RFQ form adapts to the product — injection moulding, assembly, painting — showing only the process fields that matter for that part.",
-        features: ["Process-driven dynamic forms", "No irrelevant fields", "Admin-configurable field sets", "Consistent data for costing"],
-        outcome: "Clean, process-specific data with zero form clutter."
+        id: 6, icon: "🛠️",
+        name: "Tooling Feasibility",
+        short: "Supplier submission, verification and two-level approval",
+        cycle: [
+          {
+            icon: "📬", actor: "Engineering Associate",
+            title: "Supplier Submits — Associate Notified",
+            text: "When the supplier submits the tooling feasibility, a notification goes first to the Engineering Associate."
+          },
+          {
+            icon: "🔍", actor: "Engineering Associate",
+            title: "Verify & Update Supplier Inputs",
+            text: "The associate reviews and verifies the supplier's inputs, updates anything that needs changing, and submits for approval to Ravi Sir."
+          },
+          {
+            icon: "🧐", actor: "Ravi Sir",
+            title: "Full Technical & Pricing Review",
+            text: "Ravi Sir reviews the complete Opportunity — all technical details and pricing — then forwards it to Rakesh Sir for final approval.",
+            branches: [
+              { type: "no", label: "Ravi Sir Rejects", text: "The Engineering Associate receives a notification to make the required changes." }
+            ]
+          },
+          {
+            icon: "👑", actor: "Rakesh Sir",
+            title: "Final Approval Decision",
+            text: "Rakesh Sir takes the final decision on the Opportunity.",
+            branches: [
+              { type: "ok", label: "Approved", text: "The Opportunity Owner (Marketing user) is notified that the Opportunity is ready for quotation." },
+              { type: "no", label: "Rejected", text: "Ravi Sir and the Engineering Associate receive a rejection notification." }
+            ]
+          }
+        ]
       },
       {
-        icon: "🤝", phase: "Collaborate",
-        title: "Supplier Inputs",
-        text: "Where child parts or bought-out items are involved, supplier quotes and technical inputs are collected against the RFQ itself.",
-        features: ["Supplier RFQ tracking", "Quote comparison", "Technical input capture", "Supplier cost feed into CBD"],
-        outcome: "Supplier costs flow straight into the cost breakdown."
+        id: 7, icon: "🗎",
+        name: "PDF Generation",
+        short: "Versioned Product & Tooling Feasibility PDFs",
+        cycle: [
+          {
+            icon: "📑", actor: "User",
+            title: "Generate Two PDF Documents — At Any Stage",
+            text: "Once Product and Tooling Feasibility are completed, the user can generate the Product Feasibility PDF and the Tooling Feasibility PDF at any stage of the Opportunity.",
+            chips: ["Product Feasibility PDF", "Tooling Feasibility PDF", "Available at any stage after feasibility"]
+          },
+          {
+            icon: "🗂️", actor: "System",
+            title: "Automatic Versioning",
+            text: "Both PDFs support versioning — if the Opportunity is modified and the PDF is generated again, a new version is created automatically while all previous versions are preserved."
+          }
+        ]
       }
     ]
   },
