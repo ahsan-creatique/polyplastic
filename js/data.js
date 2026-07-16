@@ -152,6 +152,12 @@ const MODULES = [
             icon: "🛤️", actor: "System",
             title: "Workflow Routes by Selected Levels",
             text: "The RFQ workflow proceeds based on the selected process levels and their sequence — every downstream screen adapts to the levels chosen here."
+          },
+          {
+            icon: "🖥️", actor: "Live Screen",
+            title: "RFQ Registration UI Template",
+            text: "See the actual Opportunity screen — the record form, dynamic process levels with Add Level, tooling table and costing tabs — exactly as the user will experience it.",
+            link: { href: "rfq-ui-template.html", label: "Open the UI Template" }
           }
         ]
       },
@@ -336,79 +342,121 @@ const MODULES = [
   {
     id: 4,
     icon: "💰",
-    name: "Costing & Quotation",
-    short: "CBD, customer quotation formats, multi-level costing",
-    desc: "From engineering data to a customer-ready price — a structured Cost Break Down engine with multi-level costing, and quotations generated in the exact format each customer expects.",
-    steps: [
+    name: "Quotation & Approval",
+    short: "Surface-finish based quote generation, revision control, KAM → CMO approval and customer submission",
+    desc: "Costing and approval as one connected engine — the quote is generated from the SURFACE FINISH logic in the client's own Excel format, locked with strict revision control, routed through the KAM → CMO conditional approval cycle, and tracked through every customer status until final approval.",
+    dfd: `
+      <div class="dfd">
+        <div class="dfd-node start">🧾 Quotation Generated <small>(V1, then R1 / R2 / R3…)</small></div>
+        <div class="dfd-arrow">▼</div>
+        <div class="dfd-node decision">Who submits the quote for approval?</div>
+        <div class="dfd-branches">
+          <div class="dfd-col">
+            <div class="dfd-edge">Path 1 · Executive / Sr. Executive</div>
+            <div class="dfd-node">👤 KAM Review <small>notification to KAM</small></div>
+            <div class="dfd-out no">✖ KAM rejects → submitter notified with reason ↺ revise &amp; resubmit to KAM</div>
+            <div class="dfd-out ok">✔ KAM approves → submitter notified → forwarded to CMO</div>
+          </div>
+          <div class="dfd-col">
+            <div class="dfd-edge">Path 2 · KAM submits</div>
+            <div class="dfd-node">Straight to CMO <small>notification to CMO</small></div>
+          </div>
+        </div>
+        <div class="dfd-arrow">▼</div>
+        <div class="dfd-node">👔 CMO — Final Internal Decision</div>
+        <div class="dfd-branches">
+          <div class="dfd-col">
+            <div class="dfd-out no">✖ CMO rejects → submitter + KAM notified with reason ↺ Executive corrects → KAM → CMO again · If KAM corrects → new quote → directly to CMO</div>
+          </div>
+          <div class="dfd-col">
+            <div class="dfd-out ok">✔ CMO approves → KAM notified — quote internally approved, ready for the customer</div>
+          </div>
+        </div>
+        <div class="dfd-arrow">▼</div>
+        <div class="dfd-node">📧 Convert to customer's Excel format (or Polyplastics default) → send via email / customer portal → status <b>In Review</b></div>
+        <div class="dfd-arrow">▼</div>
+        <div class="dfd-node decision">Customer decision</div>
+        <div class="dfd-branches three">
+          <div class="dfd-out mid">💬 Price discussion → status <b>Negotiation</b></div>
+          <div class="dfd-out no">✖ Rejected on pricing → status <b>Rejected</b> + reason ↺ correct pricing → internal approval cycle repeats</div>
+          <div class="dfd-out ok">✔ Customer approves → status <b>Approved</b> by Exec / Sr. Exec → KAM notified</div>
+        </div>
+      </div>`,
+    cycle: [
       {
-        icon: "🧮", phase: "Cost",
-        title: "Cost Break Down (CBD)",
-        text: "A structured CBD built from RFQ data — raw material, process, tooling amortisation, overheads and margin — every element visible and defendable.",
-        features: ["Material, process & overhead heads", "Tooling amortisation logic", "Rejection & handling factors", "Margin & landed cost view"],
-        outcome: "A transparent, audit-ready cost for every part."
+        icon: "🔓", actor: "Marketing User", group: "Part 1 — Costing & Quote Generation",
+        title: "'Generate RFQ' Unlocked",
+        text: "The moment Rakesh Sir gives final approval on the Opportunity (Tooling Feasibility 3.6), the 'Generate RFQ' button becomes visible to the Marketing user."
       },
       {
-        icon: "🏗️", phase: "Cost",
-        title: "Multi-Level Costing",
-        text: "Assemblies are costed level by level — child parts roll up into parent costs automatically, mirroring the product structure.",
-        features: ["Parent-child cost roll-up", "Bought-out part costs from suppliers", "Version-wise cost comparison", "What-if cost simulation"],
-        outcome: "Accurate assembly costs without spreadsheet gymnastics."
+        icon: "✨", actor: "System",
+        title: "SURFACE FINISH Auto-Calculated",
+        text: "The quote is driven by the SURFACE FINISH field on the Opportunity — calculated automatically from the combination of process levels. The combination logic is provided by the client.",
+        chips: ["Derived from level combination", "Combination matrix from client"]
       },
       {
-        icon: "📄", phase: "Quote",
-        title: "Customer Quotation Formats",
-        text: "One click renders the approved cost into the customer's own quotation template — each OEM sees the format they mandate.",
-        features: ["Per-customer quotation templates", "Auto-populated from CBD", "Commercial terms library", "PDF generation & branding"],
-        outcome: "Professional quotations in the customer's mandated format."
+        icon: "📊", actor: "System",
+        title: "Excel Template Finalized — Quote Generated",
+        text: "Based on the SURFACE FINISH value, the matching client-provided Excel template is finalized and the quotation is generated exactly in that format."
       },
       {
-        icon: "🗃️", phase: "Govern",
-        title: "Quotation Versioning",
-        text: "Every revision of price or terms creates a new quotation version — history preserved, negotiations traceable.",
-        features: ["Version & revision tracking", "Negotiation history", "Validity date control", "Won / lost price analytics"],
-        outcome: "Full commercial memory of every negotiation."
+        icon: "🔢", actor: "System",
+        title: "Quote Naming & Revisions",
+        text: "The first quotation is named Quote + V1. Every time the user clicks 'Generate Quote' again, the new quotation is named with the next revision — based on how many revisions are already associated with the Opportunity.",
+        chips: ["First quote → Name + V1", "Then → Name + R1, R2, R3…", "Revision counter per Opportunity"]
+      },
+      {
+        icon: "🔒", actor: "Business Rule", actorIcon: "⚖️",
+        title: "Quotation Locked After Creation",
+        text: "Once a quotation is created, no value on it can be changed — except the Status field. If anything needs to change, the user first changes it on the Opportunity and then generates a new quote (next revision)."
+      },
+      {
+        icon: "📮", actor: "Executive / Sr. Executive", group: "Part 2 — Internal Approval Cycle (flow diagram below)",
+        title: "Path 1 — Send for Approval → KAM",
+        text: "The Executive or Sr. Executive clicks 'Send for Approval' on the quote. It goes first to the KAM defined on the Customer, with a notification.",
+        branches: [
+          { type: "no", label: "KAM Rejects", text: "The submitter receives a notification with the rejection reason — revises the quote and sends it to the KAM again." },
+          { type: "ok", label: "KAM Approves", text: "The submitter is notified that the KAM approved — and the approval moves to the CMO with a notification." }
+        ]
+      },
+      {
+        icon: "🚀", actor: "KAM",
+        title: "Path 2 — KAM Submits Directly",
+        text: "If the KAM sends the quote for approval, the notification goes straight to the CMO — no intermediate step."
+      },
+      {
+        icon: "👔", actor: "CMO",
+        title: "CMO — Final Internal Decision",
+        text: "The CMO takes the final internal decision on the quotation.",
+        branches: [
+          { type: "no", label: "CMO Rejects", text: "The submitter (Executive / Sr. Executive) and the KAM are notified with the reason. If the Executive corrects the quote → approval goes to KAM, then CMO again. If the KAM corrects and generates a new quote → it goes directly to the CMO." },
+          { type: "ok", label: "CMO Approves", text: "The KAM is notified: the quote is internally approved and can now be sent to the customer." }
+        ]
+      },
+      {
+        icon: "📧", actor: "User", group: "Part 3 — Customer Submission & Status Tracking",
+        title: "Convert to Customer Format & Send",
+        text: "The internally approved quote is converted into the customer-specific Excel format attached on the Customer record, then sent by email or through the customer's portal. If the customer has no specific format, the Polyplastics default format is used.",
+        chips: ["Customer-specific Excel format", "Polyplastics default as fallback", "Send via email or customer portal"]
+      },
+      {
+        icon: "📊", actor: "User",
+        title: "Status: In Review → Negotiation",
+        text: "When the quote is sent, the user marks its status as In Review. If the customer argues on pricing, the status moves to Negotiation."
+      },
+      {
+        icon: "🤝", actor: "Customer",
+        title: "Customer Decision",
+        text: "The customer's final response closes the loop.",
+        branches: [
+          { type: "no", label: "Rejected on Pricing", text: "The quote status is set to Rejected with the customer's reason. The user corrects the pricing and the quote re-enters the internal approval cycle — the same flow repeats." },
+          { type: "ok", label: "Approved by Customer", text: "The Executive / Sr. Executive marks the quote status as Approved — and a notification is sent to the KAM." }
+        ]
       }
     ]
   },
   {
     id: 5,
-    icon: "✅",
-    name: "Approval Management",
-    short: "Multi-level parallel approvals for Opportunity and Quotation",
-    desc: "Governance without delay — opportunities and quotations route through configurable multi-level approval matrices, with parallel approvers, escalations and a complete audit trail.",
-    steps: [
-      {
-        icon: "🗺️", phase: "Define",
-        title: "Approval Matrix Setup",
-        text: "Approval rules are configured by value, customer, product line or margin — who approves what, in which sequence, is defined once and enforced always.",
-        features: ["Value & margin-based rules", "Role-based approver mapping", "Sequential + parallel stages", "Delegation & out-of-office rules"],
-        outcome: "The right approvers, automatically — every single time."
-      },
-      {
-        icon: "🚦", phase: "Route",
-        title: "Opportunity Approval",
-        text: "Before an RFQ is committed, the opportunity itself passes through management approval — feasibility, capacity and strategic fit reviewed.",
-        features: ["Go / No-Go decision gate", "Feasibility & capacity review", "Comments & conditions capture", "Approval SLA tracking"],
-        outcome: "Management commits capacity consciously, not by accident."
-      },
-      {
-        icon: "⚡", phase: "Route",
-        title: "Parallel Quotation Approval",
-        text: "Costing, sales head and finance can approve simultaneously — parallel approval lanes crush turnaround time without weakening control.",
-        features: ["Parallel approval lanes", "Mobile / email approvals", "Auto-reminders & escalation", "Rejection with mandatory reason"],
-        outcome: "Faster quotes to customer with full financial control."
-      },
-      {
-        icon: "📜", phase: "Audit",
-        title: "Audit Trail & Compliance",
-        text: "Every approve, reject and resubmit is time-stamped with user and comments — an audit trail that satisfies any review.",
-        features: ["Complete approval history", "Time-stamped actions", "Pending-approval dashboards", "Cycle-time analytics"],
-        outcome: "Zero-dispute governance with measurable approval speed."
-      }
-    ]
-  },
-  {
-    id: 6,
     icon: "📋",
     name: "Development Order",
     short: "DO creation, internal routing, SAP customer code trigger",
@@ -445,7 +493,7 @@ const MODULES = [
     ]
   },
   {
-    id: 7,
+    id: 6,
     icon: "🧱",
     name: "BOM & LOT Management",
     short: "Preliminary/Final BOM, List of Tooling, SAP BOM sync",
@@ -482,7 +530,7 @@ const MODULES = [
     ]
   },
   {
-    id: 8,
+    id: 7,
     icon: "🚀",
     name: "NPD Project Management",
     short: "Phase-gate tracking, development purchase, milestone management",
@@ -519,7 +567,7 @@ const MODULES = [
     ]
   },
   {
-    id: 9,
+    id: 8,
     icon: "📦",
     name: "Packaging Module",
     short: "Customer and internal packaging, approval, communication tracking",
@@ -556,7 +604,7 @@ const MODULES = [
     ]
   },
   {
-    id: 10,
+    id: 9,
     icon: "🔁",
     name: "Change Management (ECN)",
     short: "Engineering Change Notice, version/revision tracking",
@@ -593,7 +641,7 @@ const MODULES = [
     ]
   },
   {
-    id: 11,
+    id: 10,
     icon: "🔗",
     name: "SAP Integration",
     short: "Customer master, BOM, invoice, and order sync with SAP",

@@ -668,6 +668,66 @@ a { text-decoration: none; color: inherit; }
   .cycle-num { width: 46px; height: 46px; font-size: 16px; }
 }
 
+/* ---------------- DFD (conditional approval flow) ---------------- */
+.dfd-wrap { margin-bottom: 54px; }
+.dfd {
+  background: linear-gradient(160deg, #fff, var(--purple-50));
+  border: 1.5px solid var(--purple-100);
+  border-radius: var(--radius);
+  padding: 34px clamp(16px, 4vw, 44px);
+  box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.dfd-node {
+  max-width: 640px; width: 100%;
+  text-align: center;
+  background: #fff;
+  border: 1.5px solid var(--purple-300);
+  border-radius: 14px;
+  padding: 15px 22px;
+  font-weight: 600; font-size: 14.5px; color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+.dfd-node small { display: block; font-weight: 500; color: var(--ink-mute); font-size: 12px; margin-top: 2px; }
+.dfd-node.start {
+  background: var(--grad-brand); color: #fff; border-color: transparent;
+  box-shadow: 0 10px 26px rgba(124,58,237,.35);
+}
+.dfd-node.start small { color: rgba(255,255,255,.75); }
+.dfd-node.decision {
+  background: var(--ink); color: #fff; border-color: transparent;
+  border-radius: 999px;
+  font-size: 13.5px; letter-spacing: .5px;
+}
+.dfd-arrow {
+  color: var(--purple-400); font-size: 17px;
+  padding: 8px 0;
+  animation: floatArrow 1.8s ease-in-out infinite;
+}
+.dfd-branches {
+  width: 100%;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  margin: 14px 0;
+  align-items: start;
+}
+.dfd-branches.three { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.dfd-col { display: flex; flex-direction: column; gap: 10px; }
+.dfd-edge {
+  align-self: center;
+  padding: 6px 16px; border-radius: 999px;
+  background: var(--purple-100); color: var(--purple-800);
+  font-size: 12px; font-weight: 700; letter-spacing: .8px;
+}
+.dfd-col .dfd-node { max-width: none; }
+.dfd-out {
+  padding: 12px 16px; border-radius: 12px;
+  font-size: 13px; line-height: 1.55;
+}
+.dfd-out.ok  { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #14532d; }
+.dfd-out.no  { background: #fef2f2; border: 1.5px solid #fecaca; color: #7f1d1d; }
+.dfd-out.mid { background: #fffbeb; border: 1.5px solid #fde68a; color: #78350f; }
+@media (max-width: 760px) { .dfd-branches { grid-template-columns: 1fr; } }
+
 /* Journey part divider */
 .step-group {
   display: flex; align-items: center; gap: 18px;

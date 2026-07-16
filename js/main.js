@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="mc-top">
             <div class="mc-ico">${m.icon}</div>
             <div>
-              <div class="mc-tag">Module ${String(m.id).padStart(2, "0")} · ${m.submodules ? m.submodules.length + " sub-modules" : m.steps.length + " journey steps"}</div>
+              <div class="mc-tag">Module ${String(m.id).padStart(2, "0")} · ${m.submodules ? m.submodules.length + " sub-modules" : m.cycle ? m.cycle.length + " flow stages" : m.steps.length + " journey steps"}</div>
               <h3>${m.name}</h3>
             </div>
           </div>

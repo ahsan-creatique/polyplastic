@@ -43,6 +43,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ? `<div class="mh-stat"><b>${pad(sub.cycle.length)}</b><small>Cycle Stages</small></div>
        <div class="mh-stat"><b>${pad(new Set(sub.cycle.map(c => c.actor)).size)}</b><small>Actors Involved</small></div>
        <div class="mh-stat"><b>${sub.cycle.some(c => c.branches) ? "Yes" : "—"}</b><small>Approval Gate</small></div>`
+    : mod.cycle
+    ? `<div class="mh-stat"><b>${pad(mod.cycle.length)}</b><small>Flow Stages</small></div>
+       <div class="mh-stat"><b>${pad(new Set(mod.cycle.map(c => c.actor)).size)}</b><small>Actors Involved</small></div>
+       <div class="mh-stat"><b>${mod.cycle.some(c => c.branches) ? "Yes" : "—"}</b><small>Approval Gate</small></div>`
     : mod.submodules
     ? `<div class="mh-stat"><b>${pad(mod.submodules.length)}</b><small>Sub-Modules</small></div>
        <div class="mh-stat"><b>${pad(mod.submodules.reduce((n, s) => n + s.cycle.length, 0))}</b><small>Execution Stages</small></div>
@@ -71,12 +75,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const wrap = document.getElementById("stepsWrap");
 
-  /* ---------- Sub-module execution cycle (sub pages) ---------- */
-  if (sub) {
-    const head = document.querySelector(".sec-head-center .sec-title");
-    if (head) head.innerHTML = `Execution <span class="grad-text">Cycle</span>`;
-    sub.cycle.forEach((c, i) => {
-      if (i > 0) {
+  /* ---------- Shared execution-cycle renderer ---------- */
+  const renderCycle = cycle => {
+    cycle.forEach((c, i) => {
+      if (c.group) {
+        const div = document.createElement("div");
+        div.className = "step-group";
+        div.innerHTML = `<span>${c.group}</span>`;
+        wrap.appendChild(div);
+      } else if (i > 0) {
         const arrow = document.createElement("div");
         arrow.className = "cycle-arrow";
         arrow.innerHTML = "▼";
@@ -94,6 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <h3>${c.title}</h3>
           <p>${c.text}</p>
           ${c.chips ? `<div class="opt-chips">${c.chips.map(o => `<span>${o}</span>`).join("")}</div>` : ""}
+          ${c.link ? `<a class="btn btn-primary" style="margin-top:16px; padding:12px 26px; font-size:14px;" href="${c.link.href}">${c.link.label} →</a>` : ""}
           ${c.branches ? `<div class="branch-grid">${c.branches.map(b => `
             <div class="branch ${b.type}">
               <b>${b.type === "ok" ? "✔" : "✖"} ${b.label}</b>
@@ -109,6 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }, { threshold: .15 });
     wrap.querySelectorAll(".cycle-step").forEach(r => cycObs.observe(r));
+  };
+
+  /* ---------- Sub-module execution cycle (sub pages) ---------- */
+  if (sub) {
+    const head = document.querySelector(".sec-head-center .sec-title");
+    if (head) head.innerHTML = `Execution <span class="grad-text">Cycle</span>`;
+    renderCycle(sub.cycle);
 
     /* Prev / next sub-module nav */
     const nav = document.getElementById("moduleNav");
@@ -122,6 +137,36 @@ document.addEventListener("DOMContentLoaded", () => {
       <a class="next ${nSub ? "" : "disabled"}" href="${nSub ? `module-${id}-sub-${nSub.id}.html` : "#"}">
         <span class="nav-label">Next Sub-Module →</span>
         <span class="nav-title">${nSub ? `${id}.${nSub.id} · ${nSub.name}` : "End of sub-modules"}</span>
+      </a>`;
+    return;
+  }
+
+  /* ---------- Module-level cycle with optional DFD (e.g. Quotation & Approval) ---------- */
+  if (mod.cycle) {
+    const head = document.querySelector(".sec-head-center .sec-title");
+    if (head) head.innerHTML = `Module <span class="grad-text">Journey</span>`;
+    renderCycle(mod.cycle);
+    if (mod.dfd) {
+      const dfdBlock = document.createElement("div");
+      dfdBlock.className = "dfd-wrap";
+      dfdBlock.style.marginTop = "46px";
+      dfdBlock.innerHTML = `
+        <div class="step-group"><span>Approval Cycle — Conditional Flow (DFD)</span></div>
+        ${mod.dfd}`;
+      wrap.appendChild(dfdBlock);
+    }
+
+    const nav = document.getElementById("moduleNav");
+    const prevM = MODULES.find(m => m.id === id - 1);
+    const nextM = MODULES.find(m => m.id === id + 1);
+    nav.innerHTML = `
+      <a class="prev ${prevM ? "" : "disabled"}" href="${prevM ? `module-${prevM.id}.html` : "#"}">
+        <span class="nav-label">← Previous Module</span>
+        <span class="nav-title">${prevM ? `${pad(prevM.id)} · ${prevM.name}` : "Start of journey"}</span>
+      </a>
+      <a class="next ${nextM ? "" : "disabled"}" href="${nextM ? `module-${nextM.id}.html` : "#"}">
+        <span class="nav-label">Next Module →</span>
+        <span class="nav-title">${nextM ? `${pad(nextM.id)} · ${nextM.name}` : "End of journey — Invoice"}</span>
       </a>`;
     return;
   }
