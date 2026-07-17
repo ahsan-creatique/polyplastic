@@ -313,14 +313,42 @@ const MODULES = [
             title: "Final Approval Decision",
             text: "Rakesh Sir takes the final decision on the Opportunity.",
             branches: [
-              { type: "ok", label: "Approved", text: "The Opportunity Owner (Marketing user) is notified that the Opportunity is ready for quotation." },
+              { type: "ok", label: "Approved", text: "A notification and approval are sent to the Costing team for adding the production cost — the journey continues in Sub-Module 3.7 Product Costing & Margins." },
               { type: "no", label: "Rejected", text: "Ravi Sir and the Engineering Associate receive a rejection notification." }
             ]
           }
         ]
       },
       {
-        id: 7, icon: "🗎",
+        id: 7, icon: "🧮",
+        name: "Product Costing & Margins",
+        short: "Costing team production cost and KAM margins after final approval",
+        cycle: [
+          {
+            icon: "📨", actor: "System",
+            title: "Approval Triggers the Costing Team",
+            text: "As soon as Rakesh Sir approves the request, an approval and a notification are sent to the Costing team on the Opportunity."
+          },
+          {
+            icon: "🧾", actor: "Costing Team",
+            title: "Review & Fill Production Cost",
+            text: "The Costing team user reviews the Opportunity and fills in the production cost against it."
+          },
+          {
+            icon: "📤", actor: "Costing Team",
+            title: "Send to the Customer's KAM",
+            text: "After filling the cost, the Costing team sends the Opportunity to the KAM of the customer."
+          },
+          {
+            icon: "💹", actor: "KAM",
+            title: "Add Margins — Ready for Quotation",
+            text: "The KAM adds the margins on top of the production cost and marks the status as Ready for Quotation.",
+            chips: ["Margins added by KAM", "Status → Ready for Quotation"]
+          }
+        ]
+      },
+      {
+        id: 8, icon: "🗎",
         name: "PDF Generation",
         short: "Versioned Product & Tooling Feasibility PDFs",
         cycle: [
@@ -385,8 +413,9 @@ const MODULES = [
     cycle: [
       {
         icon: "🔓", actor: "Marketing User", group: "Part 1 — Costing & Quote Generation",
-        title: "'Generate RFQ' Unlocked",
-        text: "The moment Rakesh Sir gives final approval on the Opportunity (Tooling Feasibility 3.6), the 'Generate RFQ' button becomes visible to the Marketing user."
+        title: "'Generate Quote' Unlocked",
+        text: "Once the Opportunity status is Ready for Quotation (set by the KAM in Sub-Module 3.7), the 'Generate Quote' button becomes visible on the Quotation.",
+        chips: ["Trigger: status = Ready for Quotation", "'Generate Quote' button appears"]
       },
       {
         icon: "✨", actor: "System",
@@ -396,8 +425,13 @@ const MODULES = [
       },
       {
         icon: "📊", actor: "System",
-        title: "Excel Template Finalized — Quote Generated",
-        text: "Based on the SURFACE FINISH value, the matching client-provided Excel template is finalized and the quotation is generated exactly in that format."
+        title: "Two Excel Formats Generated per Quote",
+        text: "When the quotation is created, two Excel documents are generated. First, the internal approval format — selected from the template library below based on the SURFACE FINISH value (the combination of process levels). Second, the customer format quotation. When the quote is sent for approval, the CMO receives both formats.",
+        chips: ["Generic_COP", "Aluminum Anodized Badges", "Film Decorative Products", "Glowing Logo", "3D Flexible Technology", "Electroplated Product", "Painting Product", "Hot Stamping Cost"],
+        branches: [
+          { type: "ok", label: "Excel 1 — Internal Approval", text: "Template auto-selected by SURFACE FINISH from the 8 client-provided templates — used for the internal approval cycle." },
+          { type: "ok", label: "Excel 2 — Customer Format", text: "The customer-facing quotation format — the CMO receives it along with the internal format during approval." }
+        ]
       },
       {
         icon: "🔢", actor: "System",
@@ -427,7 +461,7 @@ const MODULES = [
       {
         icon: "👔", actor: "CMO",
         title: "CMO — Final Internal Decision",
-        text: "The CMO takes the final internal decision on the quotation.",
+        text: "The CMO takes the final internal decision on the quotation — receiving both Excel formats: the internal approval template and the customer format quotation.",
         branches: [
           { type: "no", label: "CMO Rejects", text: "The submitter (Executive / Sr. Executive) and the KAM are notified with the reason. If the Executive corrects the quote → approval goes to KAM, then CMO again. If the KAM corrects and generates a new quote → it goes directly to the CMO." },
           { type: "ok", label: "CMO Approves", text: "The KAM is notified: the quote is internally approved and can now be sent to the customer." }
