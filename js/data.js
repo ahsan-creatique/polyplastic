@@ -313,7 +313,7 @@ const MODULES = [
             title: "Final Approval Decision",
             text: "Rakesh Sir takes the final decision on the Opportunity.",
             branches: [
-              { type: "ok", label: "Approved", text: "A notification and approval are sent to the Costing team for adding the production cost — the journey continues in Sub-Module 3.7 Product Costing & Margins." },
+              { type: "ok", label: "Approved", text: "A notification and approval are sent to the Costing team for adding the production cost — the journey continues in Sub-Module 3.7 Internal Product Costing & Margins." },
               { type: "no", label: "Rejected", text: "Ravi Sir and the Engineering Associate receive a rejection notification." }
             ]
           }
@@ -321,7 +321,7 @@ const MODULES = [
       },
       {
         id: 7, icon: "🧮",
-        name: "Product Costing & Margins",
+        name: "Internal Product Costing & Margins",
         short: "Costing team production cost and KAM margins after final approval",
         cycle: [
           {
@@ -335,9 +335,17 @@ const MODULES = [
             text: "The Costing team user reviews the Opportunity and fills in the production cost against it."
           },
           {
+            icon: "🧐", actor: "Rakesh Sir",
+            title: "Costing Approval by Rakesh Sir",
+            text: "Once the Costing team fills the costing, it first goes to Rakesh Sir for approval of the production cost.",
+            branches: [
+              { type: "ok", label: "Approved", text: "The Opportunity moves forward to the KAM of the customer." }
+            ]
+          },
+          {
             icon: "📤", actor: "Costing Team",
             title: "Send to the Customer's KAM",
-            text: "After filling the cost, the Costing team sends the Opportunity to the KAM of the customer."
+            text: "After Rakesh Sir's approval, the Opportunity is sent to the KAM of the customer."
           },
           {
             icon: "💹", actor: "KAM",
