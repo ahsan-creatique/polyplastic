@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    Module detail pages — renders journey from MODULES data
    Reads: <body data-module="N">
    ============================================================ */
@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const pad = n => String(n).padStart(2, "0");
   document.title = sub
-    ? `M${pad(id)}.${subId} — ${sub.name} | Creatique × Polyplastic`
-    : `Module ${pad(id)} — ${mod.name} | Creatique × Polyplastic`;
+    ? `M${pad(id)}.${subId} — ${sub.name} | Creatique × Polyplastics`
+    : `Module ${pad(id)} — ${mod.name} | Creatique × Polyplastics`;
 
   /* ---------- Sticky header ---------- */
   const header = document.querySelector(".site-header");

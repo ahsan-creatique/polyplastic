@@ -1,12 +1,12 @@
-# Polyplastic — Lead-to-Invoice Digital Solution
+﻿# Polyplastics — Lead-to-Invoice Digital Solution
 
-A comprehensive digital transformation proposal by **Creatique Technologies** for **Polyplastic**, delivering an integrated 10-module solution that connects every stage of the business journey from customer enquiry to final invoice.
+A comprehensive digital transformation proposal by **Creatique Technologies** for **Polyplastics**, delivering an integrated 10-module solution that connects every stage of the business journey from customer enquiry to final invoice.
 
 ---
 
 ## 📋 Project Overview
 
-**Polyplastic** is a complete Lead-to-Invoice digital platform designed to streamline and automate the entire business process. The solution integrates **10 interconnected modules** with **SAP backend integration**, ensuring seamless data flow, zero re-entry, and complete visibility across sales, engineering, manufacturing, and finance.
+**Polyplastics** is a complete Lead-to-Invoice digital platform designed to streamline and automate the entire business process. The solution integrates **10 interconnected modules** with **SAP backend integration**, ensuring seamless data flow, zero re-entry, and complete visibility across sales, engineering, manufacturing, and finance.
 
 ### Key Statistics
 - **Total Modules**: 10 primary modules
@@ -374,14 +374,14 @@ Module 5: Development Order
 ## 📧 Contact & Support
 
 **Prepared by:** Creatique Technologies  
-**Client:** Polyplastic  
+**Client:** Polyplastics  
 **Tagline:** "You Dream. We Deliver."
 
 ---
 
 ## 📄 License
 
-© 2026 Creatique Technologies. Prepared exclusively for Polyplastic.
+© 2026 Creatique Technologies. Prepared exclusively for Polyplastics.
 
 ---
 
