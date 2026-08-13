@@ -104,8 +104,8 @@ window.RFQConfig = window.RFQConfig || {};
   }
 
   // Body-only version (no card/heading beyond a sub-header) — used as the
-  // "Component Material Information" section below Tooling Process
-  // Quantity, inside the Feasibility of Tooling tab.
+  // "Tooling Construction" section below List of Tooling, inside the
+  // Tooling Feasibility tab.
   RFQConfig.renderComponentMaterialInformationBody = function renderComponentMaterialInformationBody() {
     var el = LM.el;
     var components = RFQConfig.state.assemblyRows;
@@ -113,7 +113,7 @@ window.RFQConfig = window.RFQConfig || {};
     var head = el("div", { class: "sf-section__head sf-section__head--sub" }, [
       el("div", { class: "sf-section__title" }, [
         el("div", { class: "sf-section__bar" }),
-        el("h2", {}, ["Component Material Information"])
+        el("h2", {}, ["Tooling Construction"])
       ])
     ]);
 

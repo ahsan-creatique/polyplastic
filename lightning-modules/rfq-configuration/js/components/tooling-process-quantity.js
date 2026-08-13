@@ -203,7 +203,7 @@ window.RFQConfig = window.RFQConfig || {};
   }
 
   // Body-only version (no card/heading beyond a sub-header) — used as the
-  // "Feasibility of Tooling" tab's content inside the Part Assembly tab strip.
+  // "Tooling Feasibility" tab's content inside the Part Assembly tab strip.
   RFQConfig.renderToolingProcessQuantityBody = function renderToolingProcessQuantityBody() {
     var el = LM.el;
     var state = RFQConfig.state.toolingProcessQuantity;
@@ -212,7 +212,7 @@ window.RFQConfig = window.RFQConfig || {};
     var head = el("div", { class: "sf-section__head sf-section__head--sub" }, [
       el("div", { class: "sf-section__title" }, [
         el("div", { class: "sf-section__bar" }),
-        el("h2", {}, ["Tooling Process Quantity"])
+        el("h2", {}, ["List of Tooling"])
       ]),
       el("button", { class: "sf-btn sf-btn--brand", onclick: addRow }, ["+ Add Row"])
     ]);

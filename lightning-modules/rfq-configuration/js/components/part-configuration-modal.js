@@ -1188,11 +1188,10 @@ window.RFQConfig = window.RFQConfig || {};
     ]);
   }
 
-  // Process tables (Molding/Plating/Painting/BOP/NRP) get a persona-gated
-  // pricing view: Ravi keeps the existing columns (Spec/Qty/Cust. Spec)
-  // exactly as before, but Harish/Anurag see a *replacement* column set —
-  // Sr.No/Description/UOM/MHR (INR)/Amount (INR) only, no Qty/Spec/Cust.
-  // Spec — since Amount already folds the quantity into the calculation.
+  // Process tables (Molding/Plating/Painting/BOP/NRP) show their Qty/Spec
+  // (and Cust. Spec, where present) columns for every persona — Harish and
+  // Anurag additionally get MHR (INR) / Amount (INR) appended after them,
+  // rather than those columns replacing Qty/Spec like they used to.
   function processMhrCell(row, onUpdate) {
     return numberCell(row.mhr || "", onUpdate, "MHR");
   }
@@ -1205,34 +1204,18 @@ window.RFQConfig = window.RFQConfig || {};
     return el("td", {}, [el("span", { class: "sf-table__derived" }, [amount])]);
   }
 
-  // Column headers for the Process table's pricing view — same 5-column
-  // shape (Sr.No/Description/UOM/MHR/Amount) for every process type; only
-  // the Description column's label text varies ("Item Description" vs
-  // "Description").
-  function processPricingModeHeaders(descriptionLabel) {
+  // Trailing MHR/Amount headers appended after a Process table's base
+  // columns for Harish/Anurag — same 2-column shape for every process
+  // type.
+  function processPricingTrailingHeaders() {
     var el = LM.el;
-    return [
-      el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
-      el("th", {}, [descriptionLabel]),
-      el("th", {}, ["UOM"]),
-      el("th", {}, ["MHR (INR)"]),
-      el("th", {}, ["Amount (INR)"])
-    ];
+    return [el("th", {}, ["MHR (INR)"]), el("th", {}, ["Amount (INR)"])];
   }
 
-  // Row for the Process table's pricing view — takes a pre-built
-  // description cell so each table can keep its own description styling
-  // (derived text vs. locked label), and an optional row class so tables
-  // whose Ravi rows are shaded (sf-table__fixed-row) stay shaded here too.
-  function processPricingModeRow(index, descriptionCell, uomValue, quantityValue, row, onMhrUpdate, rowClass) {
-    var el = LM.el;
-    return el("tr", { class: rowClass || "" }, [
-      el("td", { class: "sf-table__actioncol" }, [el("span", { class: "sf-table__derived" }, [String(index + 1)])]),
-      descriptionCell,
-      el("td", {}, [el("span", { class: "sf-table__derived" }, [uomValue])]),
-      processMhrCell(row, onMhrUpdate),
-      processAmountCell(quantityValue, row)
-    ]);
+  // Trailing MHR/Amount cells appended after a Process table row's base
+  // cells for Harish/Anurag.
+  function processPricingTrailingCells(quantityValue, row, onMhrUpdate) {
+    return [processMhrCell(row, onMhrUpdate), processAmountCell(quantityValue, row)];
   }
 
   function computeProcessTotalAmount(rows, quantityFieldName) {
@@ -1245,21 +1228,24 @@ window.RFQConfig = window.RFQConfig || {};
     return total;
   }
 
-  // Total Amount row for a Process table's pricing view — same 5-column
-  // shape as processPricingModeRow (Sr.No/Description/UOM/MHR/Amount), so
-  // always exactly 2 dashes (UOM, MHR) between the label and the value.
-  function processTotalAmountRow(level, rows, quantityFieldName) {
+  // Total Amount row for a Process table, shown only for Harish/Anurag.
+  // `dashCount` fills every column between the label (in the Description
+  // position) and the value (in the trailing Amount position) — it varies
+  // per table since each one has a different number of base columns
+  // (Qty/Spec only vs. Qty + Cust. Spec) ahead of the MHR/Amount pair.
+  function processTotalAmountRow(level, rows, quantityFieldName, dashCount) {
     var total = computeProcessTotalAmount(rows, quantityFieldName);
     level.processTotalAmount = total;
     if (!showsRawMaterialPricing()) return null;
     var el = LM.el;
+    var dashes = [];
+    for (var i = 0; i < dashCount; i++) dashes.push(dashCell());
     return el("tr", { class: "sf-table__fixed-row" }, [
       el("td", { class: "sf-table__actioncol" }, []),
-      totalAmountLabelCell(),
-      dashCell(),
-      dashCell(),
+      totalAmountLabelCell()
+    ].concat(dashes).concat([
       totalAmountValueCell(total)
-    ]);
+    ]));
   }
 
   function rawMaterialTypeCell(row, levelId) {
@@ -1586,34 +1572,33 @@ window.RFQConfig = window.RFQConfig || {};
   function renderBopProcessRow(row, index, levelId) {
     var el = LM.el;
     var descCell = el("td", {}, [el("span", { class: "sf-table__locked-label" }, [row.description])]);
-    if (showsRawMaterialPricing()) {
-      return processPricingModeRow(index, descCell, row.uom, row.qty, row, function (v) { updateBopProcessMhr(levelId, row.id, v); }, "sf-table__fixed-row");
-    }
-    return el("tr", { class: "sf-table__fixed-row" }, [
+    var cells = [
       el("td", { class: "sf-table__actioncol" }, [el("span", { class: "sf-table__derived" }, [String(index + 1)])]),
       descCell,
       el("td", {}, [el("span", { class: "sf-table__derived" }, [row.uom])]),
       textCell(row.qty, function (v) { updateBopProcessQty(levelId, row.id, v); }, "Qty")
-    ]);
+    ];
+    if (showsRawMaterialPricing()) {
+      cells = cells.concat(processPricingTrailingCells(row.qty, row, function (v) { updateBopProcessMhr(levelId, row.id, v); }));
+    }
+    return el("tr", { class: "sf-table__fixed-row" }, cells);
   }
 
   function bopProcessColgroupCols() {
     var el = LM.el;
-    if (showsRawMaterialPricing()) {
-      return [
-        el("col", { class: "sf-bopproc-col--icon" }, []),
-        el("col", { class: "sf-bopproc-col--desc" }, []),
-        el("col", { class: "sf-bopproc-col--uom" }, []),
-        el("col", { class: "sf-bopproc-col--qty" }, []),
-        el("col", { class: "sf-bopproc-col--qty" }, [])
-      ];
-    }
-    return [
+    var cols = [
       el("col", { class: "sf-bopproc-col--icon" }, []),
       el("col", { class: "sf-bopproc-col--desc" }, []),
       el("col", { class: "sf-bopproc-col--uom" }, []),
       el("col", { class: "sf-bopproc-col--qty" }, [])
     ];
+    if (showsRawMaterialPricing()) {
+      cols = cols.concat([
+        el("col", { class: "sf-bopproc-col--qty" }, []),
+        el("col", { class: "sf-bopproc-col--qty" }, [])
+      ]);
+    }
+    return cols;
   }
 
   function renderBopProcessTable(level) {
@@ -1622,16 +1607,16 @@ window.RFQConfig = window.RFQConfig || {};
 
     var colgroup = el("colgroup", {}, bopProcessColgroupCols());
     var thead = el("thead", {}, [
-      el("tr", {}, showsRawMaterialPricing() ? processPricingModeHeaders("Description") : [
+      el("tr", {}, [
         el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
         el("th", {}, ["Description"]),
         el("th", {}, ["UOM"]),
         el("th", {}, ["Qty"])
-      ])
+      ].concat(showsRawMaterialPricing() ? processPricingTrailingHeaders() : []))
     ]);
     var tbody = el("tbody", {}, level.bopProcessRows.map(function (row, index) { return renderBopProcessRow(row, index, level.id); }));
 
-    var bopProcessTotalRow = processTotalAmountRow(level, level.bopProcessRows, "qty");
+    var bopProcessTotalRow = processTotalAmountRow(level, level.bopProcessRows, "qty", 3);
     var bopProcessTables = [resizableTable("bop-process", colgroup, thead, tbody)];
     if (bopProcessTotalRow) bopProcessTables.push(totalsTable("bop-process", el("colgroup", {}, bopProcessColgroupCols()), bopProcessTotalRow));
 
@@ -1641,15 +1626,16 @@ window.RFQConfig = window.RFQConfig || {};
   function renderNrpProcessRow(row, index, levelId) {
     var el = LM.el;
     var descCell = el("td", {}, [el("span", { class: "sf-table__locked-label" }, [row.description])]);
-    if (showsRawMaterialPricing()) {
-      return processPricingModeRow(index, descCell, row.uom, row.qty, row, function (v) { updateNrpProcessMhr(levelId, row.id, v); }, "sf-table__fixed-row");
-    }
-    return el("tr", { class: "sf-table__fixed-row" }, [
+    var cells = [
       el("td", { class: "sf-table__actioncol" }, [el("span", { class: "sf-table__derived" }, [String(index + 1)])]),
       descCell,
       el("td", {}, [el("span", { class: "sf-table__derived" }, [row.uom])]),
       textCell(row.qty, function (v) { updateNrpProcessQty(levelId, row.id, v); }, "Qty / Hr")
-    ]);
+    ];
+    if (showsRawMaterialPricing()) {
+      cells = cells.concat(processPricingTrailingCells(row.qty, row, function (v) { updateNrpProcessMhr(levelId, row.id, v); }));
+    }
+    return el("tr", { class: "sf-table__fixed-row" }, cells);
   }
 
   function renderNrpProcessTable(level) {
@@ -1658,16 +1644,16 @@ window.RFQConfig = window.RFQConfig || {};
 
     var colgroup = el("colgroup", {}, bopProcessColgroupCols());
     var thead = el("thead", {}, [
-      el("tr", {}, showsRawMaterialPricing() ? processPricingModeHeaders("Item Description") : [
+      el("tr", {}, [
         el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
         el("th", {}, ["Item Description"]),
         el("th", {}, ["UOM"]),
         el("th", {}, ["Qty / Hr"])
-      ])
+      ].concat(showsRawMaterialPricing() ? processPricingTrailingHeaders() : []))
     ]);
     var tbody = el("tbody", {}, level.nrpProcessRows.map(function (row, index) { return renderNrpProcessRow(row, index, level.id); }));
 
-    var nrpProcessTotalRow = processTotalAmountRow(level, level.nrpProcessRows, "qty");
+    var nrpProcessTotalRow = processTotalAmountRow(level, level.nrpProcessRows, "qty", 3);
     var nrpProcessTables = [resizableTable("nrp-process", colgroup, thead, tbody)];
     if (nrpProcessTotalRow) nrpProcessTables.push(totalsTable("nrp-process", el("colgroup", {}, bopProcessColgroupCols()), nrpProcessTotalRow));
 
@@ -1892,39 +1878,44 @@ window.RFQConfig = window.RFQConfig || {};
     ]));
   }
 
+  // Anurag/Harish drop Cust. Spec entirely instead of appending MHR/Amount
+  // after it — their Plating Process table is Sr.No/Description/UOM/Qty/
+  // MHR (INR)/Amount (INR) only. Ravi keeps Cust. Spec, no MHR/Amount.
   function renderPlatingProcessRow(row, index, levelId) {
     var el = LM.el;
     var descCell = el("td", {}, [el("span", { class: "sf-table__locked-label" }, [row.description])]);
-    if (showsRawMaterialPricing()) {
-      return processPricingModeRow(index, descCell, row.uom, row.qty, row, function (v) { updatePlatingProcessRow(levelId, row.id, "mhr", v); }, "sf-table__fixed-row");
-    }
-    return el("tr", { class: "sf-table__fixed-row" }, [
+    var qtyCell = textCell(row.qty, function (v) { updatePlatingProcessRow(levelId, row.id, "qty", v); }, "Qty");
+    var cells = [
       el("td", { class: "sf-table__actioncol" }, [el("span", { class: "sf-table__derived" }, [String(index + 1)])]),
       descCell,
       el("td", {}, [el("span", { class: "sf-table__derived" }, [row.uom])]),
-      textCell(row.qty, function (v) { updatePlatingProcessRow(levelId, row.id, "qty", v); }, "Qty"),
-      textCell(row.custSpec, function (v) { updatePlatingProcessRow(levelId, row.id, "custSpec", v); }, "Cust. Spec")
-    ]);
+      qtyCell
+    ];
+    if (showsRawMaterialPricing()) {
+      cells = cells.concat(processPricingTrailingCells(row.qty, row, function (v) { updatePlatingProcessRow(levelId, row.id, "mhr", v); }));
+    } else {
+      cells.push(textCell(row.custSpec, function (v) { updatePlatingProcessRow(levelId, row.id, "custSpec", v); }, "Cust. Spec"));
+    }
+    return el("tr", { class: "sf-table__fixed-row" }, cells);
   }
 
   function platingProcessColgroupCols() {
     var el = LM.el;
-    if (showsRawMaterialPricing()) {
-      return [
-        el("col", { class: "sf-pltproc-col--icon" }, []),
-        el("col", { class: "sf-pltproc-col--desc" }, []),
-        el("col", { class: "sf-pltproc-col--uom" }, []),
-        el("col", { class: "sf-pltproc-col--spec" }, []),
-        el("col", { class: "sf-pltproc-col--spec" }, [])
-      ];
-    }
-    return [
+    var cols = [
       el("col", { class: "sf-pltproc-col--icon" }, []),
       el("col", { class: "sf-pltproc-col--desc" }, []),
       el("col", { class: "sf-pltproc-col--uom" }, []),
-      el("col", { class: "sf-pltproc-col--qty" }, []),
-      el("col", { class: "sf-pltproc-col--spec" }, [])
+      el("col", { class: "sf-pltproc-col--qty" }, [])
     ];
+    if (showsRawMaterialPricing()) {
+      cols = cols.concat([
+        el("col", { class: "sf-pltproc-col--spec" }, []),
+        el("col", { class: "sf-pltproc-col--spec" }, [])
+      ]);
+    } else {
+      cols.push(el("col", { class: "sf-pltproc-col--spec" }, []));
+    }
+    return cols;
   }
 
   function renderPlatingProcessTable(level) {
@@ -1932,18 +1923,20 @@ window.RFQConfig = window.RFQConfig || {};
     ensurePlatingProcessData(level);
 
     var colgroup = el("colgroup", {}, platingProcessColgroupCols());
+    var baseHeaders = [
+      el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
+      el("th", {}, ["Description"]),
+      el("th", {}, ["UOM"]),
+      el("th", {}, ["Qty"])
+    ];
     var thead = el("thead", {}, [
-      el("tr", {}, showsRawMaterialPricing() ? processPricingModeHeaders("Description") : [
-        el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
-        el("th", {}, ["Description"]),
-        el("th", {}, ["UOM"]),
-        el("th", {}, ["Qty"]),
-        el("th", {}, ["Cust. Spec"])
-      ])
+      el("tr", {}, showsRawMaterialPricing()
+        ? baseHeaders.concat(processPricingTrailingHeaders())
+        : baseHeaders.concat([el("th", {}, ["Cust. Spec"])]))
     ]);
     var tbody = el("tbody", {}, level.platingProcessRows.map(function (row, index) { return renderPlatingProcessRow(row, index, level.id); }));
 
-    var platingProcessTotalRow = processTotalAmountRow(level, level.platingProcessRows, "qty");
+    var platingProcessTotalRow = processTotalAmountRow(level, level.platingProcessRows, "qty", 3);
     var platingProcessTables = [resizableTable("plating-process", colgroup, thead, tbody)];
     if (platingProcessTotalRow) platingProcessTables.push(totalsTable("plating-process", el("colgroup", {}, platingProcessColgroupCols()), platingProcessTotalRow));
 
@@ -1953,10 +1946,7 @@ window.RFQConfig = window.RFQConfig || {};
   function renderProcessRow(row, index, levelId) {
     var el = LM.el;
     var descCell = el("td", {}, [el("span", { class: "sf-table__derived" }, [row.description])]);
-    if (showsRawMaterialPricing()) {
-      return processPricingModeRow(index, descCell, row.uom, row.spec, row, function (v) { updateProcessRowMhr(levelId, row.id, v); });
-    }
-    return el("tr", {}, [
+    var cells = [
       el("td", { class: "sf-table__actioncol" }, [el("span", { class: "sf-table__derived" }, [String(index + 1)])]),
       descCell,
       el("td", {}, [el("span", { class: "sf-table__derived" }, [row.uom])]),
@@ -1967,26 +1957,28 @@ window.RFQConfig = window.RFQConfig || {};
         value: row.spec,
         onchange: function (e) { updateProcessSpec(levelId, row.id, e.target.value); }
       }, [])])
-    ]);
+    ];
+    if (showsRawMaterialPricing()) {
+      cells = cells.concat(processPricingTrailingCells(row.spec, row, function (v) { updateProcessRowMhr(levelId, row.id, v); }));
+    }
+    return el("tr", {}, cells);
   }
 
   function moldingProcessColgroupCols() {
     var el = LM.el;
-    if (showsRawMaterialPricing()) {
-      return [
-        el("col", { class: "sf-proc-col--icon" }, []),
-        el("col", { class: "sf-proc-col--desc" }, []),
-        el("col", { class: "sf-proc-col--uom" }, []),
-        el("col", { class: "sf-proc-col--spec" }, []),
-        el("col", { class: "sf-proc-col--spec" }, [])
-      ];
-    }
-    return [
+    var cols = [
       el("col", { class: "sf-proc-col--icon" }, []),
       el("col", { class: "sf-proc-col--desc" }, []),
       el("col", { class: "sf-proc-col--uom" }, []),
       el("col", { class: "sf-proc-col--spec" }, [])
     ];
+    if (showsRawMaterialPricing()) {
+      cols = cols.concat([
+        el("col", { class: "sf-proc-col--spec" }, []),
+        el("col", { class: "sf-proc-col--spec" }, [])
+      ]);
+    }
+    return cols;
   }
 
   function renderMoldingProcessTable(level) {
@@ -1995,55 +1987,59 @@ window.RFQConfig = window.RFQConfig || {};
 
     var colgroup = el("colgroup", {}, moldingProcessColgroupCols());
     var thead = el("thead", {}, [
-      el("tr", {}, showsRawMaterialPricing() ? processPricingModeHeaders("Item Description") : [
+      el("tr", {}, [
         el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
         el("th", {}, ["Item Description"]),
         el("th", {}, ["UOM"]),
         el("th", {}, ["Spec"])
-      ])
+      ].concat(showsRawMaterialPricing() ? processPricingTrailingHeaders() : []))
     ]);
     var tbody = el("tbody", {}, level.processRows.map(function (row, index) { return renderProcessRow(row, index, level.id); }));
 
-    var totalRow = processTotalAmountRow(level, level.processRows, "spec");
+    var totalRow = processTotalAmountRow(level, level.processRows, "spec", 3);
     var tables = [resizableTable("molding-process", colgroup, thead, tbody)];
     if (totalRow) tables.push(totalsTable("molding-process", el("colgroup", {}, moldingProcessColgroupCols()), totalRow));
 
     return el("div", { class: "sf-table-wrap" }, tables);
   }
 
+  // Anurag/Harish drop Spec entirely instead of appending MHR/Amount after
+  // it — their Painting Process table is Sr.No/Description/UOM/Qty/MHR
+  // (INR)/Amount (INR) only. Ravi keeps Spec, no MHR/Amount.
   function renderPaintingProcessRow(row, index, levelId) {
     var el = LM.el;
     var descCell = el("td", {}, [el("span", { class: "sf-table__locked-label" }, [row.description])]);
-    if (showsRawMaterialPricing()) {
-      return processPricingModeRow(index, descCell, row.uom, row.qty, row, function (v) { updatePaintingProcessRow(levelId, row.id, "mhr", v); }, "sf-table__fixed-row");
-    }
-    return el("tr", { class: "sf-table__fixed-row" }, [
+    var cells = [
       el("td", { class: "sf-table__actioncol" }, [el("span", { class: "sf-table__derived" }, [String(index + 1)])]),
       descCell,
       el("td", {}, [el("span", { class: "sf-table__derived" }, [row.uom])]),
-      textCell(row.qty, function (v) { updatePaintingProcessRow(levelId, row.id, "qty", v); }, "Qty"),
-      textCell(row.spec, function (v) { updatePaintingProcessRow(levelId, row.id, "spec", v); }, "Spec")
-    ]);
+      textCell(row.qty, function (v) { updatePaintingProcessRow(levelId, row.id, "qty", v); }, "Qty")
+    ];
+    if (showsRawMaterialPricing()) {
+      cells = cells.concat(processPricingTrailingCells(row.qty, row, function (v) { updatePaintingProcessRow(levelId, row.id, "mhr", v); }));
+    } else {
+      cells.push(textCell(row.spec, function (v) { updatePaintingProcessRow(levelId, row.id, "spec", v); }, "Spec"));
+    }
+    return el("tr", { class: "sf-table__fixed-row" }, cells);
   }
 
   function paintingProcessColgroupCols() {
     var el = LM.el;
-    if (showsRawMaterialPricing()) {
-      return [
-        el("col", { class: "sf-pltproc-col--icon" }, []),
-        el("col", { class: "sf-pltproc-col--desc" }, []),
-        el("col", { class: "sf-pltproc-col--uom" }, []),
-        el("col", { class: "sf-pltproc-col--spec" }, []),
-        el("col", { class: "sf-pltproc-col--spec" }, [])
-      ];
-    }
-    return [
+    var cols = [
       el("col", { class: "sf-pltproc-col--icon" }, []),
       el("col", { class: "sf-pltproc-col--desc" }, []),
       el("col", { class: "sf-pltproc-col--uom" }, []),
-      el("col", { class: "sf-pltproc-col--qty" }, []),
-      el("col", { class: "sf-pltproc-col--spec" }, [])
+      el("col", { class: "sf-pltproc-col--qty" }, [])
     ];
+    if (showsRawMaterialPricing()) {
+      cols = cols.concat([
+        el("col", { class: "sf-pltproc-col--spec" }, []),
+        el("col", { class: "sf-pltproc-col--spec" }, [])
+      ]);
+    } else {
+      cols.push(el("col", { class: "sf-pltproc-col--spec" }, []));
+    }
+    return cols;
   }
 
   function renderPaintingProcessTable(level) {
@@ -2051,18 +2047,20 @@ window.RFQConfig = window.RFQConfig || {};
     ensurePaintingProcessData(level);
 
     var colgroup = el("colgroup", {}, paintingProcessColgroupCols());
+    var baseHeaders = [
+      el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
+      el("th", {}, ["Description"]),
+      el("th", {}, ["UOM"]),
+      el("th", {}, ["Qty"])
+    ];
     var thead = el("thead", {}, [
-      el("tr", {}, showsRawMaterialPricing() ? processPricingModeHeaders("Description") : [
-        el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
-        el("th", {}, ["Description"]),
-        el("th", {}, ["UOM"]),
-        el("th", {}, ["Qty"]),
-        el("th", {}, ["Spec"])
-      ])
+      el("tr", {}, showsRawMaterialPricing()
+        ? baseHeaders.concat(processPricingTrailingHeaders())
+        : baseHeaders.concat([el("th", {}, ["Spec"])]))
     ]);
     var tbody = el("tbody", {}, level.paintingProcessRows.map(function (row, index) { return renderPaintingProcessRow(row, index, level.id); }));
 
-    var paintingProcessTotalRow = processTotalAmountRow(level, level.paintingProcessRows, "qty");
+    var paintingProcessTotalRow = processTotalAmountRow(level, level.paintingProcessRows, "qty", 3);
     var paintingProcessTables = [resizableTable("painting-process", colgroup, thead, tbody)];
     if (paintingProcessTotalRow) paintingProcessTables.push(totalsTable("painting-process", el("colgroup", {}, paintingProcessColgroupCols()), paintingProcessTotalRow));
 

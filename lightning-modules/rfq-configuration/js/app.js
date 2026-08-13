@@ -100,9 +100,13 @@ window.RFQConfig = window.RFQConfig || {};
       },
       {
         id: 4, componentMaterial: "LOGO", quantity: "1",
-        // Only 3 process levels for LOGO — Level 4 (BOP Assembly) and
-        // Level 5 (Non Returnable Packaging) are removed, not just blank.
-        processLevels: RFQConfig.buildSeededProcessLevels(["MOLDING", "PLATING", "PAINTING"]),
+        // All 5 level cards show up like every other component, but Level
+        // 4 and Level 5 default to --None-- (blank value) — a level only
+        // counts toward Raw Material Cost / Process Cost once a process is
+        // actually selected for it, so LOGO's default configuration only
+        // costs out Molding/Plating/Painting until a user picks something
+        // for the other two.
+        processLevels: RFQConfig.buildSeededProcessLevels(["MOLDING", "PLATING", "PAINTING", "", ""]),
         partPicture: "https://m.media-amazon.com/images/I/51NYlkjmlEL._AC_UF1000,1000_QL80_.jpg",
         materialInfo: { moldSize: "450 X 300 X 350", noOfCavity: "2", moldWeight: "500" }
       }

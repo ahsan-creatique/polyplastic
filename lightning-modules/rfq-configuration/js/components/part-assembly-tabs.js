@@ -8,17 +8,17 @@ window.RFQConfig = window.RFQConfig || {};
   // Feasibility" has one wired up; the rest render a reserved placeholder
   // until their components are built in a later pass.
   var TABS = [
-    { key: "process-feasibility", label: "Process Feasibility" },
-    { key: "tooling-feasibility", label: "Feasibility of Tooling" },
-    { key: "testing-feasibility", label: "Feasibility of Testing" },
+    { key: "process-feasibility", label: "Part Feasibility" },
+    { key: "tooling-feasibility", label: "Tooling Feasibility" },
+    { key: "testing-feasibility", label: "Testing Feasibility" },
     { key: "design-development", label: "Design & Development" },
     { key: "costing", label: "Costing" }
   ];
 
-  // Sub-tabs shown inside the "Feasibility of Tooling" tab.
+  // Sub-tabs shown inside the "Tooling Feasibility" tab.
   var TOOLING_SUB_TABS = [
-    { key: "tooling-process-quantity", label: "Tooling Process Quantity", render: function () { return RFQConfig.renderToolingProcessQuantityBody(); } },
-    { key: "component-material-information", label: "Component Material Information", render: function () { return RFQConfig.renderComponentMaterialInformationBody(); } }
+    { key: "tooling-process-quantity", label: "List of Tooling", render: function () { return RFQConfig.renderToolingProcessQuantityBody(); } },
+    { key: "component-material-information", label: "Tooling Construction", render: function () { return RFQConfig.renderComponentMaterialInformationBody(); } }
   ];
 
   // Sub-tabs shown inside the "Design & Development" tab — no components

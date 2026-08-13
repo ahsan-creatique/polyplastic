@@ -10,6 +10,15 @@ window.RFQConfig = window.RFQConfig || {};
 
     var opp = RFQConfig.fieldByKey("oppName");
     var cust = RFQConfig.fieldByKey("custName");
+    var nepNo = RFQConfig.partFieldByKey("nepNo");
+    var sopDate = RFQConfig.partFieldByKey("sopDate");
+
+    // Customer Name | NEP No. | SOP Date: <date> — NEP No. shows as a bare
+    // value (same as its badge elsewhere), SOP Date gets a label since a
+    // bare date alone wouldn't say what it is.
+    var subParts = [cust.value];
+    if (nepNo && nepNo.value) subParts.push(nepNo.value);
+    if (sopDate && sopDate.value) subParts.push("SOP Date: " + LM.formatDate(sopDate.value));
 
     var icon = el("div", { class: "sf-record-icon" }, [
       el("span", { html:
@@ -17,35 +26,53 @@ window.RFQConfig = window.RFQConfig || {};
       })
     ]);
 
-    var actions = el("div", { class: "sf-highlights__actions" }, [
-      el("button", {
-        class: "sf-btn",
-        onclick: function () {
-          state.fields = RFQConfig.initialFields();
-          state.partFields = RFQConfig.initialPartFields();
-          state.assemblyRows = RFQConfig.initialAssemblyRows();
-          state.assemblyNextId = 4;
-          state.partPicture = RFQConfig.DEFAULT_PART_PICTURE;
-          state.dirty = false;
-          state.editingKey = null;
-          RFQConfig.renderApp();
-        }
-      }, ["Cancel"]),
-      el("button", {
-        class: "sf-btn sf-btn--brand",
-        onclick: function () { state.dirty = false; state.editingKey = null; RFQConfig.renderApp(); }
-      }, ["Save"])
-    ]);
+    var cancelBtn = el("button", {
+      class: "sf-btn",
+      onclick: function () {
+        state.fields = RFQConfig.initialFields();
+        state.partFields = RFQConfig.initialPartFields();
+        state.assemblyRows = RFQConfig.initialAssemblyRows();
+        state.assemblyNextId = 4;
+        state.partPicture = RFQConfig.DEFAULT_PART_PICTURE;
+        state.dirty = false;
+        state.editingKey = null;
+        RFQConfig.renderApp();
+      }
+    }, ["Cancel"]);
+
+    var saveBtn = el("button", {
+      class: "sf-btn sf-btn--brand",
+      onclick: function () { state.dirty = false; state.editingKey = null; RFQConfig.renderApp(); }
+    }, ["Save"]);
+
+    // Cancel/Save are only meaningful once there's something to discard or
+    // persist — Generate Quote isn't gated by that, so it's disabled
+    // independently (never, for now) instead of through this same check.
     if (!state.dirty) {
-      actions.querySelectorAll("button").forEach(function (btn) { btn.setAttribute("disabled", "disabled"); });
+      cancelBtn.setAttribute("disabled", "disabled");
+      saveBtn.setAttribute("disabled", "disabled");
     }
+
+    var actionChildren = [];
+    var stageField = RFQConfig.fieldByKey("stage");
+    if (stageField && stageField.value === "Ready for Quotation") {
+      actionChildren.push(el("button", {
+        class: "sf-btn sf-btn--brand",
+        onclick: function () {
+          window.alert("Quote generated for " + RFQConfig.fieldByKey("oppName").value + ".");
+        }
+      }, ["Generate Quote"]));
+    }
+    actionChildren.push(cancelBtn, saveBtn);
+
+    var actions = el("div", { class: "sf-highlights__actions" }, actionChildren);
 
     var top = el("div", { class: "sf-highlights__top" }, [
       icon,
       el("div", { class: "sf-highlights__title" }, [
         el("div", { class: "sf-highlights__eyebrow" }, ["Opportunity"]),
         el("div", { class: "sf-highlights__name" }, [opp.value]),
-        el("div", { class: "sf-highlights__sub" }, [cust.value])
+        el("div", { class: "sf-highlights__sub" }, [subParts.join(" | ")])
       ]),
       actions
     ]);

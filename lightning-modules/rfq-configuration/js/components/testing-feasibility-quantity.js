@@ -102,7 +102,7 @@ window.RFQConfig = window.RFQConfig || {};
 
   function lotCell(row) {
     var options = lotOptionsForProcess(row.process);
-    return selectCell(row.lot, options, "--Select LOT--", !row.process, function (v) {
+    return selectCell(row.lot, options, "--Select Type of Testing--", !row.process, function (v) {
       updateRow(row.id, "lot", v);
     });
   }
@@ -185,7 +185,7 @@ window.RFQConfig = window.RFQConfig || {};
       el("tr", {}, [
         el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
         el("th", {}, ["Process"]),
-        el("th", {}, ["LOT"]),
+        el("th", {}, ["Type of Testing"]),
         el("th", {}, ["UOM"])
       ].concat(components.map(function (c) {
         return el("th", {}, [c.componentMaterial || "—"]);
