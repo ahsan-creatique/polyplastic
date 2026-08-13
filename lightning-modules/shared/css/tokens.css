@@ -1,0 +1,76 @@
+/* ============================================================
+   Shared design tokens for all Lightning-themed modules.
+   Mirrors SLDS v2 styling-hook values, with light/dark variants.
+   ============================================================ */
+
+:root{
+  --sf-accent-1:#0176d3;
+  --sf-accent-1-hover:#014486;
+  --sf-accent-soft:#eaf5fe;
+  --sf-accent-soft-border:#cbe6fb;
+
+  --sf-surface-1:#ffffff;
+  --sf-surface-2:#f3f2f2;
+  --sf-surface-3:#f4f6f9;
+
+  --sf-on-surface-1:#5c5c5c;
+  --sf-on-surface-2:#181818;
+  --sf-on-surface-3:#032d60;
+
+  --sf-border-1:#dddbda;
+  --sf-border-2:#c9c9c9;
+
+  --sf-warn-bg:#fef8ec;
+  --sf-warn-border:#fdc788;
+  --sf-warn-text:#8a5a00;
+
+  --sf-danger:#ba0517;
+
+  --sf-shadow-1:0 1px 2px rgba(0,0,0,.05), 0 4px 10px rgba(0,0,0,.04);
+  --sf-shadow-2:0 4px 14px rgba(0,0,0,.10);
+
+  --sf-radius-1:6px;
+  --sf-radius-2:10px;
+
+  --sf-ease:.15s cubic-bezier(.2,.7,.3,1);
+
+  --sf-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+:root[data-theme="dark"]{
+  --sf-surface-1:#242424;
+  --sf-surface-2:#181818;
+  --sf-surface-3:#2e2e2e;
+  --sf-on-surface-1:#aeaeae;
+  --sf-on-surface-2:#f0f0f0;
+  --sf-on-surface-3:#a8cbff;
+  --sf-border-1:#3e3e3e;
+  --sf-border-2:#4a4a4a;
+  --sf-accent-soft:#0d2b45;
+  --sf-accent-soft-border:#164668;
+  --sf-warn-bg:#3a2c0f;
+  --sf-warn-border:#6b4d16;
+  --sf-warn-text:#f0c674;
+  --sf-shadow-1:0 1px 2px rgba(0,0,0,.4);
+  --sf-shadow-2:0 2px 8px rgba(0,0,0,.5);
+}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sf-surface-1:#242424;
+    --sf-surface-2:#181818;
+    --sf-surface-3:#2e2e2e;
+    --sf-on-surface-1:#aeaeae;
+    --sf-on-surface-2:#f0f0f0;
+    --sf-on-surface-3:#a8cbff;
+    --sf-border-1:#3e3e3e;
+    --sf-border-2:#4a4a4a;
+    --sf-accent-soft:#0d2b45;
+    --sf-accent-soft-border:#164668;
+    --sf-warn-bg:#3a2c0f;
+    --sf-warn-border:#6b4d16;
+    --sf-warn-text:#f0c674;
+    --sf-shadow-1:0 1px 2px rgba(0,0,0,.4);
+    --sf-shadow-2:0 2px 8px rgba(0,0,0,.5);
+  }
+}
