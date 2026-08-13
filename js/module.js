@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    Module detail pages — renders journey from MODULES data
    Reads: <body data-module="N">
    ============================================================ */
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <h3>${c.title}</h3>
           <p>${c.text}</p>
           ${c.chips ? `<div class="opt-chips">${c.chips.map(o => `<span>${o}</span>`).join("")}</div>` : ""}
-          ${c.link ? `<a class="btn btn-primary" style="margin-top:16px; padding:12px 26px; font-size:14px;" href="${c.link.href}">${c.link.label} →</a>` : ""}
+          ${c.links ? `<div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">${c.links.map(l => `<a class="btn ${l.secondary ? 'btn-ghost' : 'btn-primary'}" style="padding:12px 26px; font-size:14px;" href="${l.href}">${l.label} →</a>`).join("")}</div>` : c.link ? `<a class="btn btn-primary" style="margin-top:16px; padding:12px 26px; font-size:14px;" href="${c.link.href}">${c.link.label} →</a>` : ""}
           ${c.branches ? `<div class="branch-grid">${c.branches.map(b => `
             <div class="branch ${b.type}">
               <b>${b.type === "ok" ? "✔" : "✖"} ${b.label}</b>

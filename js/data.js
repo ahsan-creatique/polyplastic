@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    Creatique Technologies — Polyplastics Solution
    Module journey data (Lead ➜ Invoice)
    ============================================================ */
@@ -157,7 +157,11 @@ const MODULES = [
             icon: "🖥️", actor: "Live Screen",
             title: "RFQ Registration UI Template",
             text: "See the actual Opportunity screen — the record form, dynamic process levels with Add Level, tooling table and costing tabs — exactly as the user will experience it.",
-            link: { href: "rfq-ui-template.html", label: "Open the UI Template" }
+            link: { href: "rfq-ui-template.html", label: "Old UI Template" },
+            links: [
+              { href: "rfq-ui-template.html", label: "Old UI Template", secondary: true },
+              { href: "../lightning-modules/rfq-configuration/index.html", label: "Open RFQ Configuration Template" }
+            ]
           }
         ]
       },
