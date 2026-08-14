@@ -36,6 +36,7 @@ window.RFQConfig = window.RFQConfig || {};
       { key: "custName", label: "Customer Name", type: "text", editable: true, required: true, value: "Maruti Suzuki GGN" },
       { key: "custCode", label: "Customer Code", type: "text", editable: false, value: "0000043" },
       { key: "stage", label: "Stage Name", type: "picklist", editable: true, value: "Feasibility Study", options: STAGE_OPTIONS },
+      { key: "probability", label: "Probability", type: "text", editable: false, value: "10%" },
       { key: "date", label: "Date", type: "date", editable: true, value: TODAY },
       { key: "closeDate", label: "Close Date", type: "date", editable: true, value: LM.addDaysIso(TODAY, 20) },
       { key: "custRefNo", label: "Customer Ref. No.", type: "text", editable: true, value: "MS000232S" },
