@@ -145,14 +145,14 @@ window.RFQConfig = window.RFQConfig || {};
       return renderRow(item, index, components);
     });
     var tbody = el("tbody", {}, dataRows);
-    var mainTable = el("table", { class: "sf-table" }, [costingColgroup(components), thead, tbody]);
+    var mainTable = LM.resizableTable(RFQConfig.state.columnWidths, "ppapCost", costingColgroup(components), thead, tbody);
 
     // Total Cost is a separate <table> (sharing the same column layout)
     // rather than a row inside the main table's tbody.
     var ppapTotals = components.map(function (c) { return ppapColumnTotal(c.id); });
     var ppapOverall = ppapTotals.reduce(function (a, b) { return a + b; }, 0);
     var totalCostRow = fixedRow("sf-table__fixed-row", "TOTAL COST", ppapTotals, ppapOverall);
-    var totalsTable = el("table", { class: "sf-table sf-table--totals" }, [costingColgroup(components), el("tbody", {}, [totalCostRow])]);
+    var totalsTable = LM.resizableTable(RFQConfig.state.columnWidths, "ppapCost", costingColgroup(components), null, el("tbody", {}, [totalCostRow]), "sf-table--totals");
 
     return el("div", { class: "sf-table-wrap" }, [mainTable, totalsTable]);
   }
@@ -164,7 +164,7 @@ window.RFQConfig = window.RFQConfig || {};
     var row = fixedRow("sf-table__fixed-row", "GRAND TOTAL COST", grandTotals, grandOverall);
 
     return el("div", { class: "sf-table-wrap" }, [
-      el("table", { class: "sf-table" }, [costingColgroup(components), el("tbody", {}, [row])])
+      LM.resizableTable(RFQConfig.state.columnWidths, "ppapCost", costingColgroup(components), null, el("tbody", {}, [row]))
     ]);
   }
 

@@ -137,7 +137,7 @@ window.RFQConfig = window.RFQConfig || {};
   ];
 
   function cloneRawMaterialRow(r) {
-    return { id: r.id, type: r.type, itemCode: r.itemCode, itemDescription: r.itemDescription, uom: r.uom, qty: r.qty, supplier: r.supplier, custSpec: r.custSpec, price: r.price };
+    return { id: r.id, type: r.type, itemCode: r.itemCode, itemDescription: r.itemDescription, uom: r.uom, qty: r.qty, supplier: r.supplier, custSpec: r.custSpec, price: r.price, remark: r.remark };
   }
 
   function cloneProcessRow(r) {
@@ -145,7 +145,7 @@ window.RFQConfig = window.RFQConfig || {};
   }
 
   function clonePlatingRow(r) {
-    return { id: r.id, fixed: r.fixed, description: r.description, uom: r.uom, qty: r.qty, custSpec: r.custSpec, price: r.price };
+    return { id: r.id, fixed: r.fixed, description: r.description, uom: r.uom, qty: r.qty, custSpec: r.custSpec, price: r.price, remark: r.remark };
   }
 
   function clonePlatingProcessRow(r) {
@@ -153,7 +153,7 @@ window.RFQConfig = window.RFQConfig || {};
   }
 
   function clonePaintingRow(r) {
-    return { id: r.id, type: r.type, itemCode: r.itemCode, itemDescription: r.itemDescription, uom: r.uom, qty: r.qty, supplier: r.supplier, custSpec: r.custSpec, price: r.price };
+    return { id: r.id, type: r.type, itemCode: r.itemCode, itemDescription: r.itemDescription, uom: r.uom, qty: r.qty, supplier: r.supplier, custSpec: r.custSpec, price: r.price, remark: r.remark };
   }
 
   function clonePaintingProcessRow(r) {
@@ -161,7 +161,7 @@ window.RFQConfig = window.RFQConfig || {};
   }
 
   function cloneBopRow(r) {
-    return { id: r.id, itemCode: r.itemCode, itemDescription: r.itemDescription, uom: r.uom, qty: r.qty, supplier: r.supplier, custSpec: r.custSpec, price: r.price };
+    return { id: r.id, itemCode: r.itemCode, itemDescription: r.itemDescription, uom: r.uom, qty: r.qty, supplier: r.supplier, custSpec: r.custSpec, price: r.price, remark: r.remark };
   }
 
   function cloneBopProcessRow(r) {
@@ -169,7 +169,7 @@ window.RFQConfig = window.RFQConfig || {};
   }
 
   function cloneNrpRow(r) {
-    return { id: r.id, type: r.type, itemCode: r.itemCode, itemDescription: r.itemDescription, uom: r.uom, qty: r.qty, supplier: r.supplier, custSpec: r.custSpec, price: r.price };
+    return { id: r.id, type: r.type, itemCode: r.itemCode, itemDescription: r.itemDescription, uom: r.uom, qty: r.qty, supplier: r.supplier, custSpec: r.custSpec, price: r.price, remark: r.remark };
   }
 
   function cloneNrpProcessRow(r) {
@@ -604,7 +604,7 @@ window.RFQConfig = window.RFQConfig || {};
     var modal = RFQConfig.state.partConfigModal;
     var level = findLevel(modal, levelId);
     if (!level) return;
-    level.rawMaterialRows.push({ id: level.rawMaterialNextId++, type: RAW_MATERIAL_TYPES[0], itemCode: "", itemDescription: "", uom: "", qty: "", supplier: "", custSpec: "", price: "" });
+    level.rawMaterialRows.push({ id: level.rawMaterialNextId++, type: RAW_MATERIAL_TYPES[0], itemCode: "", itemDescription: "", uom: "", qty: "", supplier: "", custSpec: "", price: "", remark: "" });
     RFQConfig.renderApp();
   }
 
@@ -644,7 +644,7 @@ window.RFQConfig = window.RFQConfig || {};
     var modal = RFQConfig.state.partConfigModal;
     var level = findLevel(modal, levelId);
     if (!level) return;
-    level.platingRows.push({ id: level.platingNextId++, fixed: false, description: "", uom: "", qty: "", custSpec: "", price: "" });
+    level.platingRows.push({ id: level.platingNextId++, fixed: false, description: "", uom: "", qty: "", custSpec: "", price: "", remark: "" });
     RFQConfig.renderApp();
   }
 
@@ -685,7 +685,7 @@ window.RFQConfig = window.RFQConfig || {};
     var modal = RFQConfig.state.partConfigModal;
     var level = findLevel(modal, levelId);
     if (!level) return;
-    level.paintingRows.push({ id: level.paintingNextId++, type: PAINTING_TYPES[0], itemCode: "", itemDescription: "", uom: "", qty: "", supplier: "", custSpec: "", price: "" });
+    level.paintingRows.push({ id: level.paintingNextId++, type: PAINTING_TYPES[0], itemCode: "", itemDescription: "", uom: "", qty: "", supplier: "", custSpec: "", price: "", remark: "" });
     RFQConfig.renderApp();
   }
 
@@ -722,7 +722,7 @@ window.RFQConfig = window.RFQConfig || {};
     var modal = RFQConfig.state.partConfigModal;
     var level = findLevel(modal, levelId);
     if (!level) return;
-    level.bopRows.push({ id: level.bopNextId++, itemCode: "", itemDescription: "", uom: "", qty: "", supplier: "", custSpec: "", price: "" });
+    level.bopRows.push({ id: level.bopNextId++, itemCode: "", itemDescription: "", uom: "", qty: "", supplier: "", custSpec: "", price: "", remark: "" });
     RFQConfig.renderApp();
   }
 
@@ -759,7 +759,7 @@ window.RFQConfig = window.RFQConfig || {};
     var modal = RFQConfig.state.partConfigModal;
     var level = findLevel(modal, levelId);
     if (!level) return;
-    level.nrpRows.push({ id: level.nrpNextId++, type: NRP_TYPES[0], itemCode: "", itemDescription: "", uom: "", qty: "", supplier: "", custSpec: "", price: "" });
+    level.nrpRows.push({ id: level.nrpNextId++, type: NRP_TYPES[0], itemCode: "", itemDescription: "", uom: "", qty: "", supplier: "", custSpec: "", price: "", remark: "" });
     RFQConfig.renderApp();
   }
 
@@ -1003,18 +1003,7 @@ window.RFQConfig = window.RFQConfig || {};
   // Raw Material, Plating Process, etc. — shares one width set across
   // levels), and wires up the drag handles for further resizing.
   function resizableTable(tableKey, colgroup, thead, tbody) {
-    var table = LM.el("table", { class: "sf-table" }, [colgroup, thead, tbody]);
-    var savedWidths = RFQConfig.state.columnWidths[tableKey];
-    if (savedWidths) {
-      var cols = colgroup.children;
-      for (var i = 0; i < cols.length && i < savedWidths.length; i++) {
-        cols[i].style.width = savedWidths[i] + "px";
-      }
-    }
-    LM.enableColumnResize(table, function (widths) {
-      RFQConfig.state.columnWidths[tableKey] = widths;
-    });
-    return table;
+    return LM.resizableTable(RFQConfig.state.columnWidths, tableKey, colgroup, thead, tbody);
   }
 
   // A completely separate <table> (not nested inside the main Raw Material
@@ -1023,16 +1012,7 @@ window.RFQConfig = window.RFQConfig || {};
   // but it's a sibling element, genuinely outside the main table rather
   // than a tfoot/tbody row within it.
   function totalsTable(tableKey, colgroup, totalRow) {
-    var el = LM.el;
-    var table = el("table", { class: "sf-table sf-table--totals" }, [colgroup, el("tbody", {}, [totalRow])]);
-    var savedWidths = RFQConfig.state.columnWidths[tableKey];
-    if (savedWidths) {
-      var cols = colgroup.children;
-      for (var i = 0; i < cols.length && i < savedWidths.length; i++) {
-        cols[i].style.width = savedWidths[i] + "px";
-      }
-    }
-    return table;
+    return LM.resizableTable(RFQConfig.state.columnWidths, tableKey, colgroup, null, LM.el("tbody", {}, [totalRow]), "sf-table--totals");
   }
 
   function textCell(value, onCommit, placeholder) {
@@ -1104,6 +1084,18 @@ window.RFQConfig = window.RFQConfig || {};
     return cells;
   }
 
+  // Remark is a plain free-text column on every Raw Material table
+  // (Molding/Painting/BOP/NRP/Plating) — unlike the Price/Amount vs.
+  // Supplier/Cust. Spec columns above, it's the same for every persona;
+  // switching between Ravi/Anurag/Harish never hides or relabels it.
+  function remarkHeader() {
+    return LM.el("th", {}, ["Remark"]);
+  }
+
+  function remarkCell(row, levelId, updateFn) {
+    return textCell(row.remark || "", function (v) { updateFn(levelId, row.id, "remark", v); }, "Remark");
+  }
+
   // Sum of Qty × Price across a Raw Material table's rows — the number
   // other components will read back later via
   // level.rawMaterialTotalAmount.
@@ -1148,6 +1140,7 @@ window.RFQConfig = window.RFQConfig || {};
       dashCell(),
       dashCell(),
       totalAmountValueCell(total),
+      dashCell(),
       el("td", { class: "sf-table__actioncol" }, [])
     ]);
   }
@@ -1166,6 +1159,7 @@ window.RFQConfig = window.RFQConfig || {};
       dashCell(),
       dashCell(),
       totalAmountValueCell(total),
+      dashCell(),
       el("td", { class: "sf-table__actioncol" }, [])
     ]);
   }
@@ -1184,6 +1178,7 @@ window.RFQConfig = window.RFQConfig || {};
       dashCell(),
       dashCell(),
       totalAmountValueCell(total),
+      dashCell(),
       el("td", { class: "sf-table__actioncol" }, [])
     ]);
   }
@@ -1306,6 +1301,7 @@ window.RFQConfig = window.RFQConfig || {};
       textCell(row.uom, function (v) { updateRawMaterialRow(levelId, row.id, "uom", v); }, "UOM"),
       textCell(row.qty, function (v) { updateRawMaterialRow(levelId, row.id, "qty", v); }, "Qty")
     ].concat(rawMaterialTrailingCells(row, levelId, updateRawMaterialRow, true)).concat([
+      remarkCell(row, levelId, updateRawMaterialRow),
       rawMaterialRemoveCell(row, levelId)
     ]));
   }
@@ -1328,6 +1324,7 @@ window.RFQConfig = window.RFQConfig || {};
       }, [])]),
       el("td", {}, [el("span", { class: "sf-table__derived" }, ["—"])]),
       el("td", {}, [el("span", { class: "sf-table__derived" }, ["—"])]),
+      el("td", {}, [el("span", { class: "sf-table__derived" }, ["—"])]),
       el("td", { class: "sf-table__actioncol" }, [])
     ]);
   }
@@ -1343,6 +1340,7 @@ window.RFQConfig = window.RFQConfig || {};
       el("col", { class: "sf-rm-col--qty" }, []),
       el("col", { class: "sf-rm-col--supplier" }, []),
       el("col", { class: "sf-rm-col--spec" }, []),
+      el("col", { class: "sf-rm-col--remark" }, []),
       el("col", { class: "sf-rm-col--icon" }, [])
     ];
   }
@@ -1361,6 +1359,7 @@ window.RFQConfig = window.RFQConfig || {};
         el("th", {}, ["UOM"]),
         el("th", {}, ["Qty"])
       ].concat(rawMaterialTrailingHeaders(true)).concat([
+        remarkHeader(),
         el("th", { class: "sf-table__actioncol" }, [""])
       ]))
     ]);
@@ -1443,6 +1442,7 @@ window.RFQConfig = window.RFQConfig || {};
       textCell(row.uom, function (v) { updatePaintingRow(levelId, row.id, "uom", v); }, "UOM"),
       textCell(row.qty, function (v) { updatePaintingRow(levelId, row.id, "qty", v); }, "Qty")
     ].concat(rawMaterialTrailingCells(row, levelId, updatePaintingRow, true)).concat([
+      remarkCell(row, levelId, updatePaintingRow),
       paintingRemoveCell(row, levelId)
     ]));
   }
@@ -1461,6 +1461,7 @@ window.RFQConfig = window.RFQConfig || {};
         el("th", {}, ["UOM"]),
         el("th", {}, ["Qty"])
       ].concat(rawMaterialTrailingHeaders(true)).concat([
+        remarkHeader(),
         el("th", { class: "sf-table__actioncol" }, [""])
       ]))
     ]);
@@ -1521,6 +1522,7 @@ window.RFQConfig = window.RFQConfig || {};
       textCell(row.uom, function (v) { updateBopRow(levelId, row.id, "uom", v); }, "UOM"),
       textCell(row.qty, function (v) { updateBopRow(levelId, row.id, "qty", v); }, "Qty")
     ].concat(rawMaterialTrailingCells(row, levelId, updateBopRow, true)).concat([
+      remarkCell(row, levelId, updateBopRow),
       bopRemoveCell(row, levelId)
     ]));
   }
@@ -1535,6 +1537,7 @@ window.RFQConfig = window.RFQConfig || {};
       el("col", { class: "sf-bop-col--qty" }, []),
       el("col", { class: "sf-bop-col--supplier" }, []),
       el("col", { class: "sf-bop-col--spec" }, []),
+      el("col", { class: "sf-rm-col--remark" }, []),
       el("col", { class: "sf-table__col--icon" }, [])
     ];
   }
@@ -1552,6 +1555,7 @@ window.RFQConfig = window.RFQConfig || {};
         el("th", {}, ["UOM"]),
         el("th", {}, ["Qty"])
       ].concat(rawMaterialTrailingHeaders(true)).concat([
+        remarkHeader(),
         el("th", { class: "sf-table__actioncol" }, [""])
       ]))
     ]);
@@ -1718,6 +1722,7 @@ window.RFQConfig = window.RFQConfig || {};
       textCell(row.uom, function (v) { updateNrpRow(levelId, row.id, "uom", v); }, "UOM"),
       textCell(row.qty, function (v) { updateNrpRow(levelId, row.id, "qty", v); }, "Qty / Pack")
     ].concat(rawMaterialTrailingCells(row, levelId, updateNrpRow, true)).concat([
+      remarkCell(row, levelId, updateNrpRow),
       nrpRemoveCell(row, levelId)
     ]));
   }
@@ -1736,6 +1741,7 @@ window.RFQConfig = window.RFQConfig || {};
         el("th", {}, ["UOM"]),
         el("th", {}, ["Qty / Pack"])
       ].concat(rawMaterialTrailingHeaders(true)).concat([
+        remarkHeader(),
         el("th", { class: "sf-table__actioncol" }, [""])
       ]))
     ]);
@@ -1800,6 +1806,7 @@ window.RFQConfig = window.RFQConfig || {};
       textCell(row.uom, function (v) { updatePlatingRow(levelId, row.id, "uom", v); }, "UOM"),
       textCell(row.qty, function (v) { updatePlatingRow(levelId, row.id, "qty", v); }, "Qty")
     ].concat(rawMaterialTrailingCells(row, levelId, updatePlatingRow, false)).concat([
+      remarkCell(row, levelId, updatePlatingRow),
       platingRemoveCell(row, levelId)
     ]));
   }
@@ -1816,6 +1823,7 @@ window.RFQConfig = window.RFQConfig || {};
       el("col", { class: "sf-plt-col--qty" }, []),
       el("col", { class: "sf-plt-col--spec" }, [])
     ].concat(showsRawMaterialPricing() ? [el("col", { class: "sf-plt-col--spec" }, [])] : []).concat([
+      el("col", { class: "sf-rm-col--remark" }, []),
       el("col", { class: "sf-table__col--icon" }, [])
     ]);
   }
@@ -1832,6 +1840,7 @@ window.RFQConfig = window.RFQConfig || {};
         el("th", {}, ["UOM"]),
         el("th", {}, ["Qty"])
       ].concat(rawMaterialTrailingHeaders(false)).concat([
+        remarkHeader(),
         el("th", { class: "sf-table__actioncol" }, [""])
       ]))
     ]);
@@ -1857,7 +1866,7 @@ window.RFQConfig = window.RFQConfig || {};
   // the trailing dash count matches whichever mode is currently showing.
   function renderPlatingRejectionRow(label, uom, value, srNo, onCommit) {
     var el = LM.el;
-    var dashCount = showsRawMaterialPricing() ? 2 : 1;
+    var dashCount = (showsRawMaterialPricing() ? 2 : 1) + 1; // +1 for the Remark column
     var dashCells = [];
     for (var i = 0; i < dashCount; i++) {
       dashCells.push(el("td", {}, [el("span", { class: "sf-table__derived" }, ["—"])]));

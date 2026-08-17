@@ -198,7 +198,7 @@ window.RFQConfig = window.RFQConfig || {};
     var tbody = el("tbody", {}, rows.map(function (row, index) { return renderRow(row, index, components); }));
 
     return el("div", { class: "sf-table-wrap" }, [
-      el("table", { class: "sf-table" }, [colgroup, thead, tbody])
+      LM.resizableTable(RFQConfig.state.columnWidths, "testingFeasibilityQuantity", colgroup, thead, tbody)
     ]);
   }
 

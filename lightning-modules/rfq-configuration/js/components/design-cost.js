@@ -135,12 +135,12 @@ window.RFQConfig = window.RFQConfig || {};
       return renderRow(item, index, components);
     });
     var tbody = el("tbody", {}, dataRows);
-    var mainTable = el("table", { class: "sf-table" }, [colgroup, thead, tbody]);
+    var mainTable = LM.resizableTable(RFQConfig.state.columnWidths, "designCost", colgroup, thead, tbody);
 
     // Total Cost is a separate <table> (sharing the same column layout)
     // rather than a row inside the main table's tbody.
     var totalsColgroup = buildColgroup(components);
-    var totalsTable = el("table", { class: "sf-table sf-table--totals" }, [totalsColgroup, el("tbody", {}, [renderTotalRow(components)])]);
+    var totalsTable = LM.resizableTable(RFQConfig.state.columnWidths, "designCost", totalsColgroup, null, el("tbody", {}, [renderTotalRow(components)]), "sf-table--totals");
 
     return el("div", { class: "sf-table-wrap" }, [mainTable, totalsTable]);
   }

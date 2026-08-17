@@ -89,4 +89,28 @@ window.LM = window.LM || {};
 
     for (var i = 0; i < count; i++) loop(i);
   };
+
+  // Builds a <table class="sf-table"> that persists and restores column
+  // widths from `widthsStore[tableKey]` — every table in these apps goes
+  // through this so widths survive the state-driven rebuild-from-scratch
+  // re-render. Tables sharing a tableKey (e.g. a data table and its
+  // separate totals-row table) resize in lock-step. Pass `thead` as null
+  // for a headless totals table — it still gets saved widths applied, it
+  // just has no header cells to hang a drag handle off of.
+  LM.resizableTable = function resizableTable(widthsStore, tableKey, colgroup, thead, tbody, extraClass) {
+    var cls = extraClass ? "sf-table " + extraClass : "sf-table";
+    var children = thead ? [colgroup, thead, tbody] : [colgroup, tbody];
+    var table = LM.el("table", { class: cls }, children);
+    var savedWidths = widthsStore[tableKey];
+    if (savedWidths) {
+      var cols = colgroup.children;
+      for (var i = 0; i < cols.length && i < savedWidths.length; i++) {
+        cols[i].style.width = savedWidths[i] + "px";
+      }
+    }
+    LM.enableColumnResize(table, function (widths) {
+      widthsStore[tableKey] = widths;
+    });
+    return table;
+  };
 })(window.LM);

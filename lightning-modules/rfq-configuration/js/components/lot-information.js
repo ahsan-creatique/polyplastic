@@ -124,7 +124,7 @@ window.RFQConfig = window.RFQConfig || {};
     }));
 
     return el("div", { class: "sf-table-wrap" }, [
-      el("table", { class: "sf-table" }, [colgroup, thead, tbody])
+      LM.resizableTable(RFQConfig.state.columnWidths, "lotInformation", colgroup, thead, tbody)
     ]);
   }
 

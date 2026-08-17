@@ -135,7 +135,7 @@ window.RFQConfig = window.RFQConfig || {};
     ]);
     var tbody = el("tbody", {}, rows.map(renderRow));
     return el("div", { class: "sf-table-wrap" }, [
-      el("table", { class: "sf-table" }, [colgroup, thead, tbody])
+      LM.resizableTable(RFQConfig.state.columnWidths, "partAssemblyDetail", colgroup, thead, tbody)
     ]);
   }
 

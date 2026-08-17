@@ -124,13 +124,14 @@ window.RFQConfig = window.RFQConfig || {};
       return renderDataRow(tableKey, row, index, components);
     });
     var tbody = el("tbody", {}, dataRows);
-    var mainTable = el("table", { class: "sf-table" }, [costingColgroup(components), thead, tbody]);
+    var widthsKey = "costingOfTesting-" + tableKey;
+    var mainTable = LM.resizableTable(RFQConfig.state.columnWidths, widthsKey, costingColgroup(components), thead, tbody);
 
     // Total Cost is a separate <table> (sharing the same colgroup) rather
     // than a row inside the main table's tbody — same pattern as the Raw
     // Material tables' Total Amount.
     var totalRow = renderTotalRow("TOTAL COST", tableKey, testingRows, components);
-    var totalsTable = el("table", { class: "sf-table sf-table--totals" }, [costingColgroup(components), el("tbody", {}, [totalRow])]);
+    var totalsTable = LM.resizableTable(RFQConfig.state.columnWidths, widthsKey, costingColgroup(components), null, el("tbody", {}, [totalRow]), "sf-table--totals");
 
     return el("div", { class: "sf-table-wrap" }, [mainTable, totalsTable]);
   }
@@ -153,7 +154,7 @@ window.RFQConfig = window.RFQConfig || {};
     ]));
 
     return el("div", { class: "sf-table-wrap" }, [
-      el("table", { class: "sf-table" }, [costingColgroup(components), el("tbody", {}, [row])])
+      LM.resizableTable(RFQConfig.state.columnWidths, "costingOfTesting-grandTotal", costingColgroup(components), null, el("tbody", {}, [row]))
     ]);
   }
 

@@ -386,22 +386,23 @@ html,body{margin:0;padding:0;}
 .sf-rm-col--icon{ width:5%; }
 .sf-rm-col--type{ width:8%; }
 .sf-rm-col--code{ width:13%; }
-.sf-rm-col--desc{ width:28%; }
+.sf-rm-col--desc{ width:20%; }
 .sf-rm-col--uom{ width:7%; }
 .sf-rm-col--qty{ width:8%; }
 .sf-rm-col--supplier{ width:13%; }
 .sf-rm-col--spec{ width:13%; }
+.sf-rm-col--remark{ width:8%; }
 .sf-proc-col--icon{ width:8%; }
 .sf-proc-col--desc{ width:60%; }
 .sf-proc-col--uom{ width:14%; }
 .sf-proc-col--spec{ width:18%; }
-.sf-plt-col--desc{ width:46%; }
+.sf-plt-col--desc{ width:38%; }
 .sf-plt-col--uom{ width:10%; }
 .sf-plt-col--qty{ width:10%; }
 .sf-plt-col--spec{ width:22%; }
 .sf-table__locked-label{ font-weight:700; letter-spacing:.2px; color:var(--sf-accent-1); padding:7px 8px; display:inline-block; }
 .sf-bop-col--code{ width:14%; }
-.sf-bop-col--desc{ width:34%; }
+.sf-bop-col--desc{ width:26%; }
 .sf-bop-col--uom{ width:8%; }
 .sf-bop-col--qty{ width:8%; }
 .sf-bop-col--supplier{ width:14%; }

@@ -104,12 +104,13 @@ window.RFQConfig = window.RFQConfig || {};
 
     var dataRows = PROCESS_TYPES.map(function (p, i) { return renderRow(p, i, components, field); });
     var tbody = el("tbody", {}, dataRows);
-    var mainTable = el("table", { class: "sf-table" }, [buildColgroup(components), thead, tbody]);
+    var tableKey = "manufacturingCost-" + field;
+    var mainTable = LM.resizableTable(RFQConfig.state.columnWidths, tableKey, buildColgroup(components), thead, tbody);
 
     // Total Cost is a separate <table> (sharing the same column layout)
     // rather than a row inside the main table's tbody — same pattern used
     // by Design Cost / Costing of Testing.
-    var totalsTable = el("table", { class: "sf-table sf-table--totals" }, [buildColgroup(components), el("tbody", {}, [renderTotalRow(components, field)])]);
+    var totalsTable = LM.resizableTable(RFQConfig.state.columnWidths, tableKey, buildColgroup(components), null, el("tbody", {}, [renderTotalRow(components, field)]), "sf-table--totals");
 
     return el("div", { class: "sf-table-wrap" }, [mainTable, totalsTable]);
   }
