@@ -110,7 +110,7 @@ window.RFQConfig = window.RFQConfig || {};
     var thead = el("thead", {}, [
       el("tr", {}, [
         el("th", { class: "sf-table__actioncol" }, ["Sr. No"]),
-        el("th", {}, ["LOT"]),
+        el("th", {}, ["PPAP Activity"]),
         el("th", {}, ["UOM"])
       ].concat(components.map(function (c) {
         return el("th", {}, [c.componentMaterial || "—"]);
