@@ -283,7 +283,8 @@ MODULE 3
         - Tooling Construction & Material Information
         - Cavity, Mold Size & Mold Weight Assessment
       Links:
-        - ../lightning-modules/rfq-configuration/index.html?tab=tooling-feasibility | Open Tooling Feasibility UI
+        - ../salesforce-testing-feasibility-schema.html | Salesforce Schema & ERD — Part Formation Line & Testing Feasibility
+        - ../lightning-modules/rfq-configuration/index.html?tab=tooling-feasibility | Open Tooling Feasibility UI | secondary
     END CYCLE
 
     CYCLE
@@ -292,9 +293,9 @@ MODULE 3
       Title: RFQ Registration UI Template
       Text: See the actual Opportunity screen — the record form, dynamic process levels with Add Level, tooling table and costing tabs — exactly as the user will experience it.
       Links:
+        - ../salesforce-testing-feasibility-schema.html | Salesforce Schema & ERD — Part Formation Line & Testing Feasibility
+        - ../lightning-modules/rfq-configuration/index.html | Open RFQ Configuration Template | secondary
         - rfq-ui-template.html | Old UI Template | secondary
-        - ../lightning-modules/rfq-configuration/index.html | Open RFQ Configuration Template
-        - ../lightning-modules/rfq-configuration/index.html?tab=tooling-feasibility | Open Tooling Feasibility UI
     END CYCLE
 
   END SUBMODULE
@@ -511,7 +512,8 @@ MODULE 3
       Title: Tooling Feasibility UI
       Text: Experience the actual Tooling Feasibility interface — with the interactive List of Tooling, component quantities, and Tooling Construction specifications.
       Links:
-        - ../lightning-modules/rfq-configuration/index.html?tab=tooling-feasibility | Open Tooling Feasibility UI
+        - ../salesforce-testing-feasibility-schema.html | Salesforce Schema & ERD — Part Formation Line & Testing Feasibility
+        - ../lightning-modules/rfq-configuration/index.html?tab=tooling-feasibility | Open Tooling Feasibility UI | secondary
     END CYCLE
 
   END SUBMODULE

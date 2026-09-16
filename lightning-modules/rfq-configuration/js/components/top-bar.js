@@ -35,6 +35,12 @@ window.RFQConfig = window.RFQConfig || {};
       nav,
       el("div", { class: "sf-topbar__spacer" }),
       el("div", { class: "sf-topbar__right" }, [
+        el("a", {
+          class: "sf-btn sf-btn--secondary sf-btn--sm",
+          href: "../../salesforce-testing-feasibility-schema.html",
+          target: "_blank",
+          style: "text-decoration:none; margin-right:8px; display:inline-flex; align-items:center; gap:6px; font-size:12px;"
+        }, ["📐 Salesforce Schema & ERD"]),
         el("div", { class: "sf-role-switcher", title: "Switch demo persona" }, [roleSelect]),
         el("div", { class: "sf-avatar", title: role.name + " — " + role.team }, [role.initials])
       ])

@@ -214,7 +214,15 @@ window.RFQConfig = window.RFQConfig || {};
         el("div", { class: "sf-section__bar" }),
         el("h2", {}, ["Testing Feasibility"])
       ]),
-      el("button", { class: "sf-btn sf-btn--brand", onclick: addRow }, ["+ Add Row"])
+      el("div", { style: "display:flex; gap:8px;" }, [
+        el("a", {
+          class: "sf-btn sf-btn--secondary",
+          href: "../../salesforce-testing-feasibility-schema.html",
+          target: "_blank",
+          style: "text-decoration:none; display:inline-flex; align-items:center; gap:6px;"
+        }, ["📐 Salesforce Schema & ERD"]),
+        el("button", { class: "sf-btn sf-btn--brand", onclick: addRow }, ["+ Add Row"])
+      ])
     ]);
 
     return el("div", { class: "sf-feasibility-body" }, [
