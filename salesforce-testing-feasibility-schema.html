@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salesforce Schema — Part Formation Line & Testing Feasibility</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --surface-1: #111827;
+      --surface-2: #1e293b;
+      --surface-3: #334155;
+      --border: #2e3a4e;
+      --border-accent: #3b82f6;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --brand: #2563eb;
+      --brand-glow: rgba(37, 99, 235, 0.25);
+      --accent: #06b6d4;
+      --purple: #8b5cf6;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.5;
+      padding: 32px 24px 80px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #60a5fa, #34d399, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .header p {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 850px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--surface-1);
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .nav-btn.active {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 4px 12px var(--brand-glow);
+    }
+    .nav-btn:hover:not(.active) {
+      color: #fff;
+      background: var(--surface-2);
+    }
+
+    /* Dynamic Switcher Bar */
+    .demo-bar {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(37, 99, 235, 0.1));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .demo-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .demo-title span.badge {
+      background: #10b981;
+      color: #022c22;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .demo-title h4 {
+      font-size: 15px;
+      color: #e2e8f0;
+    }
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-1);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .toggle-btn.active {
+      background: #10b981;
+      color: #042f2e;
+    }
+
+    /* ERD Grid */
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title span.badge {
+      font-size: 11px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .erd-flow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 1024px) {
+      .erd-flow { grid-template-columns: 1fr; }
+    }
+
+    .object-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .object-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+    .object-card.highlight {
+      border-color: #a855f7;
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-header.parent { background: rgba(59, 130, 246, 0.15); }
+    .card-header.columns { background: rgba(16, 185, 129, 0.18); border-bottom: 2px solid #10b981; }
+    .card-header.rows { background: rgba(245, 158, 11, 0.15); }
+    .card-header.junction { background: rgba(168, 85, 247, 0.18); border-bottom: 2px solid #a855f7; }
+
+    .card-title-group h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .card-title-group .api-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .role-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .role-badge.parent { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+    .role-badge.columns { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+    .role-badge.rows { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+    .role-badge.junction { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
+
+    /* Field List */
+    .field-list { list-style: none; font-size: 13px; }
+    .field-item {
+      padding: 10px 20px;
+      display: grid;
+      grid-template-columns: 1.8fr 1.2fr 1fr;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .field-item:last-child { border-bottom: none; }
+    .field-item:hover { background: var(--surface-2); }
+    .field-name-block { display: flex; flex-direction: column; }
+    .field-label { font-weight: 600; color: #f1f5f9; }
+    .field-api { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+
+    .type-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      width: fit-content;
+    }
+    .type-md { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .type-lookup { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .type-text { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+    .type-number { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .type-currency { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+    .type-picklist { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+    .type-formula { background: rgba(6, 182, 212, 0.2); color: #67e8f9; }
+    .type-rollup { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px dashed rgba(236, 72, 153, 0.5); }
+    .field-ui-map { font-size: 12px; color: #94a3b8; text-align: right; }
+
+    /* Architecture Diagram Box */
+    .svg-canvas-box {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+    .svg-diagram { width: 100%; max-width: 960px; height: auto; display: block; margin: 0 auto; }
+
+    /* Interactive Live Simulation */
+    .ui-demo-section {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+    .table-container {
+      overflow-x: auto;
+      margin-top: 14px;
+      margin-bottom: 24px;
+    }
+    .demo-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      background: var(--surface-1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .demo-table th, .demo-table td {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .demo-table th {
+      background: #1e293b;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    .demo-table tr.total-row { background: #1e293b; font-weight: 700; }
+    .demo-table tr.grand-total-row {
+      background: rgba(37, 99, 235, 0.15);
+      font-weight: 800;
+      border-top: 2px solid var(--brand);
+    }
+    .highlight-cell {
+      cursor: pointer;
+      position: relative;
+      transition: background 0.15s;
+    }
+    .highlight-cell:hover {
+      background: rgba(59, 130, 246, 0.3) !important;
+      outline: 1px solid #60a5fa;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-top: 2px;
+    }
+    .tag-row { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .tag-col { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .tag-cell { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+    .tag-rollup { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+
+    /* Tooltip Box */
+    .info-tooltip {
+      background: #020617;
+      border: 1px solid #38bdf8;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #f8fafc;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+      pointer-events: none;
+      position: fixed;
+      z-index: 100;
+      display: none;
+      max-width: 320px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <h1>Salesforce Schema & ERD — Part Formation Line & Testing Feasibility</h1>
+      <p>Explaining how <strong>Part Formation Line</strong> (Grill, Garnish LH, Garnish RH, Logo...) works dynamically whether there are <strong>2, 4, or 6 components</strong>, and how it links to Testing Feasibility.</p>
+    </div>
+    <nav class="nav-tabs">
+      <button class="nav-btn active" onclick="scrollToSection('architecture-section')">1. Relationship Diagram</button>
+      <button class="nav-btn" onclick="scrollToSection('objects-section')">2. Object & Field Dictionary</button>
+      <button class="nav-btn" onclick="scrollToSection('dynamic-matrix-section')">3. Live Dynamic Simulation</button>
+    </nav>
+  </header>
+
+  <!-- Interactive Dynamic Switcher -->
+  <div class="demo-bar">
+    <div class="demo-title">
+      <span class="badge">Dynamic Capability</span>
+      <h4>Current Scenario: Test with <strong id="componentCountLabel" style="color:#34d399;">4 Components (GRILL, GARNISH RH, GARNISH LH, LOGO)</strong></h4>
+    </div>
+    <div class="toggle-group">
+      <span style="font-size:12px; color:var(--text-muted); margin-right:4px;">Try Different Part Assemblies:</span>
+      <button class="toggle-btn" onclick="setScenario(2)">2 Components</button>
+      <button class="toggle-btn active" onclick="setScenario(4)">4 Components (Default)</button>
+      <button class="toggle-btn" onclick="setScenario(6)">6 Components</button>
+    </div>
+  </div>
+
+  <!-- SECTION 1: RELATIONSHIPS -->
+  <div id="architecture-section" class="svg-canvas-box">
+    <div class="section-title">
+      <span>1. Visual Entity Relationships & Data Flow</span>
+      <span class="badge">Master-Detail & Roll-Ups</span>
+    </div>
+
+    <svg class="svg-diagram" viewBox="0 0 940 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="940" height="500" rx="12" fill="#0f172a"/>
+      
+      <!-- Parent Object: RFQ_Part__c -->
+      <rect x="340" y="25" width="260" height="95" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+      <text x="470" y="52" fill="#60a5fa" font-size="14" font-weight="700" text-anchor="middle">RFQ_Part__c</text>
+      <text x="470" y="72" fill="#94a3b8" font-size="11" text-anchor="middle">Parent Header (Part Name: YFG 27MC)</text>
+      <text x="470" y="94" fill="#38bdf8" font-size="11" font-weight="700" text-anchor="middle">Grand_Total_Testing_Cost__c</text>
+
+      <!-- Connecting Lines from Parent -->
+      <path d="M380 120 L180 200" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4 4"/>
+      <path d="M560 120 L760 200" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4 4"/>
+
+      <!-- Relationship Badges -->
+      <rect x="180" y="145" width="160" height="26" rx="4" fill="#1e293b" stroke="#10b981"/>
+      <text x="260" y="162" fill="#34d399" font-size="10" font-weight="700" text-anchor="middle">1-to-Many (N Formation Lines)</text>
+
+      <rect x="600" y="145" width="160" height="26" rx="4" fill="#1e293b" stroke="#f59e0b"/>
+      <text x="680" y="162" fill="#fbbf24" font-size="10" font-weight="700" text-anchor="middle">1-to-Many (M Testing Rows)</text>
+
+      <!-- Left Object: Part_Formation_Line__c -->
+      <rect x="40" y="200" width="280" height="120" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+      <text x="180" y="228" fill="#34d399" font-size="14" font-weight="700" text-anchor="middle">Part_Formation_Line__c</text>
+      <text x="180" y="248" fill="#94a3b8" font-size="11" text-anchor="middle">DYNAMIC COLUMNS (Grill, Garnish, Logo...)</text>
+      <text x="180" y="268" fill="#cbd5e1" font-size="10" text-anchor="middle">Can be 2, 4, 6 or more records!</text>
+      <text x="180" y="288" fill="#a7f3d0" font-size="10" font-weight="600" text-anchor="middle">Rolls up: Column_Total_Internal_Cost__c</text>
+      <text x="180" y="304" fill="#a7f3d0" font-size="10" font-weight="600" text-anchor="middle">Rolls up: Column_Total_External_Cost__c</text>
+
+      <!-- Right Object: Testing_Feasibility__c -->
+      <rect x="620" y="200" width="280" height="120" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+      <text x="760" y="228" fill="#fbbf24" font-size="14" font-weight="700" text-anchor="middle">Testing_Feasibility__c</text>
+      <text x="760" y="248" fill="#94a3b8" font-size="11" text-anchor="middle">TABLE ROWS (Molding, Plating, etc.)</text>
+      <text x="760" y="268" fill="#cbd5e1" font-size="10" text-anchor="middle">Process__c | Type_of_Testing__c | UOM__c</text>
+      <text x="760" y="288" fill="#fde68a" font-size="10" font-weight="600" text-anchor="middle">Rolls up: Row_Total_Quantity__c</text>
+      <text x="760" y="304" fill="#fde68a" font-size="10" font-weight="600" text-anchor="middle">Rolls up: Row_Total_Internal_Cost__c</text>
+
+      <!-- Lines to Junction -->
+      <path d="M180 320 L390 380" stroke="#10b981" stroke-width="2"/>
+      <path d="M760 320 L550 380" stroke="#f59e0b" stroke-width="2"/>
+
+      <!-- Center Junction: Testing_Feasibility_Detail__c -->
+      <rect x="310" y="375" width="320" height="110" rx="8" fill="#2e1065" stroke="#c084fc" stroke-width="2"/>
+      <text x="470" y="402" fill="#e9d5ff" font-size="14" font-weight="700" text-anchor="middle">Testing_Feasibility_Detail__c</text>
+      <text x="470" y="422" fill="#c084fc" font-size="11" font-weight="600" text-anchor="middle">INTERSECTION CELL (Row × Formation Line)</text>
+      <text x="470" y="442" fill="#cbd5e1" font-size="10" text-anchor="middle">Quantity__c (Number entered for this component)</text>
+      <text x="470" y="460" fill="#fef08a" font-size="10" text-anchor="middle">Internal_Cost__c & External_Cost__c (INR values)</text>
+      <text x="470" y="476" fill="#67e8f9" font-size="10" font-weight="600" text-anchor="middle">Total_Cost__c = Formula (Internal + External)</text>
+
+      <!-- Labels -->
+      <text x="240" y="370" fill="#34d399" font-size="11" font-weight="700">Which Formation Line?</text>
+      <text x="640" y="370" fill="#fbbf24" font-size="11" font-weight="700">Which Test Row?</text>
+    </svg>
+  </div>
+
+  <!-- SECTION 2: OBJECTS & FIELDS -->
+  <div id="objects-section">
+    <div class="section-title">
+      <span>2. Object Definitions & Fields</span>
+      <span class="badge">Salesforce Schema</span>
+    </div>
+
+    <div class="erd-flow">
+
+      <!-- Object 1: Part_Formation_Line__c -->
+      <div class="object-card highlight" style="border-color:#10b981;">
+        <div class="card-header columns">
+          <div class="card-title-group">
+            <h2>Part Formation Line</h2>
+            <span class="api-name">Part_Formation_Line__c</span>
+          </div>
+          <span class="role-badge columns">Dynamic Columns</span>
+        </div>
+        <ul class="field-list">
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Part Reference</span>
+              <span class="field-api">RFQ_Part__c</span>
+            </div>
+            <span class="type-pill type-md">Master-Detail</span>
+            <span class="field-ui-map">Parent Part (e.g. YFG 27MC)</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Component Material</span>
+              <span class="field-api">Component_Material__c</span>
+            </div>
+            <span class="type-pill type-text">Text(80)</span>
+            <span class="field-ui-map">Grill, Garnish LH, Logo...</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Sequence / Order</span>
+              <span class="field-api">Sequence__c</span>
+            </div>
+            <span class="type-pill type-number">Number(3,0)</span>
+            <span class="field-ui-map">1, 2, 3, 4 (controls col position)</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Total Internal Testing Cost</span>
+              <span class="field-api">Column_Total_Internal_Cost__c</span>
+            </div>
+            <span class="type-pill type-rollup">Roll-Up: SUM</span>
+            <span class="field-ui-map">Internal Costing TOTAL COST cell</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Total External Testing Cost</span>
+              <span class="field-api">Column_Total_External_Cost__c</span>
+            </div>
+            <span class="type-pill type-rollup">Roll-Up: SUM</span>
+            <span class="field-ui-map">External Costing TOTAL COST cell</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Column Grand Total Cost</span>
+              <span class="field-api">Column_Grand_Total_Cost__c</span>
+            </div>
+            <span class="type-pill type-formula">Formula: Currency</span>
+            <span class="field-ui-map">GRAND TOTAL row cell for this part</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Object 2: Testing_Feasibility__c -->
+      <div class="object-card">
+        <div class="card-header rows">
+          <div class="card-title-group">
+            <h2>Testing Feasibility</h2>
+            <span class="api-name">Testing_Feasibility__c</span>
+          </div>
+          <span class="role-badge rows">Table Rows</span>
+        </div>
+        <ul class="field-list">
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Part Reference</span>
+              <span class="field-api">RFQ_Part__c</span>
+            </div>
+            <span class="type-pill type-md">Master-Detail</span>
+            <span class="field-ui-map">Parent Part Header</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Sr. No</span>
+              <span class="field-api">Sequence__c</span>
+            </div>
+            <span class="type-pill type-number">Number(4,0)</span>
+            <span class="field-ui-map">1, 2, 3...</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Process</span>
+              <span class="field-api">Process__c</span>
+            </div>
+            <span class="type-pill type-picklist">Picklist</span>
+            <span class="field-ui-map">MOLDING, PLATING, etc.</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Type of Testing (LOT)</span>
+              <span class="field-api">Type_of_Testing__c</span>
+            </div>
+            <span class="type-pill type-picklist">Dependent Picklist</span>
+            <span class="field-ui-map">RAW MATERIAL, BOPC, etc.</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">UOM</span>
+              <span class="field-api">UOM__c</span>
+            </div>
+            <span class="type-pill type-text">Text(10) Default: "NOS"</span>
+            <span class="field-ui-map">UOM column</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Row Total Quantity</span>
+              <span class="field-api">Row_Total_Quantity__c</span>
+            </div>
+            <span class="type-pill type-rollup">Roll-Up: SUM</span>
+            <span class="field-ui-map">Feasibility Table Total column</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Row Total Internal Cost</span>
+              <span class="field-api">Row_Total_Internal_Cost__c</span>
+            </div>
+            <span class="type-pill type-rollup">Roll-Up: SUM</span>
+            <span class="field-ui-map">Internal Costing Total column</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Object 3: Testing_Feasibility_Detail__c -->
+      <div class="object-card highlight">
+        <div class="card-header junction">
+          <div class="card-title-group">
+            <h2>Testing Feasibility Detail</h2>
+            <span class="api-name">Testing_Feasibility_Detail__c</span>
+          </div>
+          <span class="role-badge junction">Matrix Cell (Junction)</span>
+        </div>
+        <ul class="field-list">
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Testing Row</span>
+              <span class="field-api">Testing_Feasibility__c</span>
+            </div>
+            <span class="type-pill type-md">Master-Detail</span>
+            <span class="field-ui-map">Connects to Test Row</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Part Formation Line</span>
+              <span class="field-api">Part_Formation_Line__c</span>
+            </div>
+            <span class="type-pill type-lookup">Master-Detail / Lookup</span>
+            <span class="field-ui-map">Connects to Formation Line</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Testing Quantity</span>
+              <span class="field-api">Quantity__c</span>
+            </div>
+            <span class="type-pill type-number">Number(8,0)</span>
+            <span class="field-ui-map">Testing Feasibility Qty input</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Internal Cost</span>
+              <span class="field-api">Internal_Cost__c</span>
+            </div>
+            <span class="type-pill type-currency">Currency(14,2)</span>
+            <span class="field-ui-map">Internal Costing INR input</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">External Cost</span>
+              <span class="field-api">External_Cost__c</span>
+            </div>
+            <span class="type-pill type-currency">Currency(14,2)</span>
+            <span class="field-ui-map">External Costing INR input</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Total Cost</span>
+              <span class="field-api">Total_Cost__c</span>
+            </div>
+            <span class="type-pill type-formula">Formula: Internal + External</span>
+            <span class="field-ui-map">Cell sum</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Object 4: RFQ_Part__c -->
+      <div class="object-card">
+        <div class="card-header parent">
+          <div class="card-title-group">
+            <h2>RFQ Part (Header)</h2>
+            <span class="api-name">RFQ_Part__c</span>
+          </div>
+          <span class="role-badge parent">Parent Header</span>
+        </div>
+        <ul class="field-list">
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Part Name</span>
+              <span class="field-api">Name</span>
+            </div>
+            <span class="type-pill type-text">Text(80)</span>
+            <span class="field-ui-map">Header Material (e.g. YFG 27MC)</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Total Internal Cost</span>
+              <span class="field-api">Total_Internal_Testing_Cost__c</span>
+            </div>
+            <span class="type-pill type-rollup">Roll-Up: SUM</span>
+            <span class="field-ui-map">Overall Internal Testing Sum</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Total External Cost</span>
+              <span class="field-api">Total_External_Testing_Cost__c</span>
+            </div>
+            <span class="type-pill type-rollup">Roll-Up: SUM</span>
+            <span class="field-ui-map">Overall External Testing Sum</span>
+          </li>
+          <li class="field-item">
+            <div class="field-name-block">
+              <span class="field-label">Grand Total Testing Cost</span>
+              <span class="field-api">Grand_Total_Testing_Cost__c</span>
+            </div>
+            <span class="type-pill type-formula">Formula: Int + Ext</span>
+            <span class="field-ui-map">Overall Grand Total</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 3: LIVE SIMULATION -->
+  <div id="dynamic-matrix-section" class="ui-demo-section">
+    <div class="section-title">
+      <span>3. Dynamic Grid Preview</span>
+      <span class="badge" id="liveColCount">4 Formation Lines Loaded</span>
+    </div>
+    <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">
+      Use the buttons at the top to toggle between <strong>2, 4, or 6 Formation Lines</strong>. Notice how the Salesforce database structure stays exactly the same — only records in <code>Part_Formation_Line__c</code> change!
+    </p>
+
+    <!-- Table 1: Feasibility Quantity -->
+    <h4 style="color:#60a5fa; margin-bottom:8px; font-size:15px;">Table 1: Testing Feasibility (Quantity)</h4>
+    <div class="table-container">
+      <table class="demo-table" id="feasibilityTable">
+        <!-- Rendered dynamically by JS -->
+      </table>
+    </div>
+
+    <!-- Table 2: Internal Costing -->
+    <h4 style="color:#f59e0b; margin-top:20px; margin-bottom:8px; font-size:15px;">Table 2: Internal Costing (INR)</h4>
+    <div class="table-container">
+      <table class="demo-table" id="internalTable">
+        <!-- Rendered dynamically by JS -->
+      </table>
+    </div>
+
+    <!-- Table 3: External Costing -->
+    <h4 style="color:#06b6d4; margin-top:20px; margin-bottom:8px; font-size:15px;">Table 3: External Costing (INR)</h4>
+    <div class="table-container">
+      <table class="demo-table" id="externalTable">
+        <!-- Rendered dynamically by JS -->
+      </table>
+    </div>
+
+    <!-- Table 4: Grand Total -->
+    <h4 style="color:#c084fc; margin-top:20px; margin-bottom:8px; font-size:15px;">Table 4: Grand Total</h4>
+    <div class="table-container">
+      <table class="demo-table" id="grandTable">
+        <!-- Rendered dynamically by JS -->
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Floating Tooltip -->
+<div id="tipBox" class="info-tooltip">
+  <div style="font-weight:700; color:#38bdf8; font-size:13px; margin-bottom:2px;" id="tipObj">Object</div>
+  <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#cbd5e1; margin-bottom:4px;" id="tipField">Field</div>
+  <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;" id="tipType">Type</div>
+  <div style="font-size:11px; color:#e2e8f0; border-top:1px solid rgba(255,255,255,0.1); padding-top:4px;" id="tipDesc">Description</div>
+</div>
+
+<script>
+  const tipBox = document.getElementById('tipBox');
+  const tipObj = document.getElementById('tipObj');
+  const tipField = document.getElementById('tipField');
+  const tipType = document.getElementById('tipType');
+  const tipDesc = document.getElementById('tipDesc');
+
+  function showTip(e, obj, field, type, desc) {
+    tipObj.textContent = "📦 " + obj;
+    tipField.textContent = "🏷️ " + field;
+    tipType.textContent = "⚙️ Type: " + type;
+    tipDesc.textContent = desc;
+    tipBox.style.display = 'block';
+    moveTip(e);
+  }
+
+  function moveTip(e) {
+    const x = e.clientX + 16;
+    const y = e.clientY + 16;
+    tipBox.style.left = Math.min(x, window.innerWidth - 340) + 'px';
+    tipBox.style.top = Math.min(y, window.innerHeight - 150) + 'px';
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    if (tipBox.style.display === 'block') moveTip(e);
+  });
+
+  // Dynamic Scenarios: 2, 4, 6 Formation Lines
+  const SCENARIOS = {
+    2: [
+      { id: "1", name: "MAIN BODY" },
+      { id: "2", name: "TOP COVER" }
+    ],
+    4: [
+      { id: "1", name: "GRILL" },
+      { id: "2", name: "GARNISH RH" },
+      { id: "3", name: "GARNISH LH" },
+      { id: "4", name: "LOGO" }
+    ],
+    6: [
+      { id: "1", name: "GRILL" },
+      { id: "2", name: "GARNISH RH" },
+      { id: "3", name: "GARNISH LH" },
+      { id: "4", name: "LOGO" },
+      { id: "5", name: "CHROME BEZEL" },
+      { id: "6", name: "MOUNTING CLIP" }
+    ]
+  };
+
+  let currentCount = 4;
+
+  function setScenario(count) {
+    currentCount = count;
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.startsWith(count + ' '));
+    });
+    document.getElementById('componentCountLabel').textContent = `${count} Components (${SCENARIOS[count].map(c => c.name).join(', ')})`;
+    document.getElementById('liveColCount').textContent = `${count} Formation Lines Loaded`;
+    renderAllTables();
+  }
+
+  function renderAllTables() {
+    const comps = SCENARIOS[currentCount];
+
+    // 1. Feasibility Table
+    let ths = `<tr><th>Sr. No</th><th>Process</th><th>Type of Testing</th><th>UOM</th>` +
+      comps.map(c => `<th style="color:#34d399;">${c.name}</th>`).join('') +
+      `<th style="color:#38bdf8;">Total</th></tr>`;
+    
+    let row1 = `<tr>
+      <td class="highlight-cell" onmouseenter="showTip(event, 'Testing_Feasibility__c', 'Sequence__c', 'Number', 'Sr. No: 1')">1</td>
+      <td class="highlight-cell" onmouseenter="showTip(event, 'Testing_Feasibility__c', 'Process__c', 'Picklist', 'MOLDING')">MOLDING</td>
+      <td class="highlight-cell" onmouseenter="showTip(event, 'Testing_Feasibility__c', 'Type_of_Testing__c', 'Dependent Picklist', 'RAW MATERIAL')">RAW MATERIAL</td>
+      <td class="highlight-cell" onmouseenter="showTip(event, 'Testing_Feasibility__c', 'UOM__c', 'Text', 'NOS')">NOS</td>` +
+      comps.map(c => `<td class="highlight-cell" onmouseenter="showTip(event, 'Testing_Feasibility_Detail__c', 'Quantity__c', 'Number', 'Quantity entered for Part Formation Line: ${c.name}')">1 <span class="tag tag-cell">Cell</span></td>`).join('') +
+      `<td class="highlight-cell" onmouseenter="showTip(event, 'Testing_Feasibility__c', 'Row_Total_Quantity__c', 'Roll-Up: SUM(Detail.Quantity__c)', 'Total across all ${comps.length} formation lines')">${comps.length} <span class="tag tag-rollup">Row Sum</span></td></tr>`;
+
+    let row2 = `<tr>
+      <td>2</td><td>PLATING</td><td>PLATING TESTING</td><td>NOS</td>` +
+      comps.map((c, idx) => idx === 0 ? `<td>—</td>` : `<td class="highlight-cell" onmouseenter="showTip(event, 'Testing_Feasibility_Detail__c', 'Quantity__c', 'Number', 'Quantity for ${c.name}')">1</td>`).join('') +
+      `<td>${comps.length - 1}</td></tr>`;
+
+    document.getElementById('feasibilityTable').innerHTML = `<thead>${ths}</thead><tbody>${row1}${row2}</tbody>`;
+
+    // 2. Internal Costing Table
+    let intThs = `<tr><th>Sr. No</th><th>Process</th><th>Internal Cost Type</th><th>UOM</th>` +
+      comps.map(c => `<th style="color:#34d399;">${c.name}</th>`).join('') +
+      `<th style="color:#38bdf8;">Total</th></tr>`;
+
+    let intRow = `<tr>
+      <td>2</td><td>PLATING</td><td>PLATING TESTING</td><td>INR</td>` +
+      comps.map((c, idx) => idx === 0 ? `<td>—</td>` : `<td class="highlight-cell" onmouseenter="showTip(event, 'Testing_Feasibility_Detail__c', 'Internal_Cost__c', 'Currency', 'Internal test cost for ${c.name}')">7,000</td>`).join('') +
+      `<td>${(comps.length - 1) * 7000}</td></tr>`;
+
+    let intTotalRow = `<tr class="total-row">
+      <td></td><td></td><td><strong style="color:#fbbf24;">TOTAL COST</strong></td><td>INR</td>` +
+      comps.map((c, idx) => `<td class="highlight-cell" onmouseenter="showTip(event, 'Part_Formation_Line__c', 'Column_Total_Internal_Cost__c', 'Roll-Up Summary', 'Sum of internal costs for formation line: ${c.name}')">${idx === 0 ? '50,000' : '47,000'} <span class="tag tag-col">Col Sum</span></td>`).join('') +
+      `<td class="highlight-cell" onmouseenter="showTip(event, 'RFQ_Part__c', 'Total_Internal_Testing_Cost__c', 'Roll-Up Summary', 'Grand sum of internal testing costs across all formation lines')">${50000 + (comps.length - 1) * 47000} <span class="tag tag-rollup">All Int Sum</span></td></tr>`;
+
+    document.getElementById('internalTable').innerHTML = `<thead>${intThs}</thead><tbody>${intRow}${intTotalRow}</tbody>`;
+
+    // 3. External Costing Table
+    let extThs = `<tr><th>Sr. No</th><th>Process</th><th>External Cost Type</th><th>UOM</th>` +
+      comps.map(c => `<th style="color:#34d399;">${c.name}</th>`).join('') +
+      `<th style="color:#38bdf8;">Total</th></tr>`;
+
+    let extRow = `<tr>
+      <td>1</td><td>MOLDING</td><td>RAW MATERIAL</td><td>INR</td>` +
+      comps.map(c => `<td class="highlight-cell" onmouseenter="showTip(event, 'Testing_Feasibility_Detail__c', 'External_Cost__c', 'Currency', 'External test cost for ${c.name}')">20,000</td>`).join('') +
+      `<td>${comps.length * 20000}</td></tr>`;
+
+    let extTotalRow = `<tr class="total-row">
+      <td></td><td></td><td><strong style="color:#38bdf8;">TOTAL COST</strong></td><td>INR</td>` +
+      comps.map(c => `<td class="highlight-cell" onmouseenter="showTip(event, 'Part_Formation_Line__c', 'Column_Total_External_Cost__c', 'Roll-Up Summary', 'Sum of external costs for formation line: ${c.name}')">20,000 <span class="tag tag-col">Col Sum</span></td>`).join('') +
+      `<td class="highlight-cell" onmouseenter="showTip(event, 'RFQ_Part__c', 'Total_External_Testing_Cost__c', 'Roll-Up Summary', 'Grand sum of external testing costs')">${comps.length * 20000} <span class="tag tag-rollup">All Ext Sum</span></td></tr>`;
+
+    document.getElementById('externalTable').innerHTML = `<thead>${extThs}</thead><tbody>${extRow}${extTotalRow}</tbody>`;
+
+    // 4. Grand Total Table
+    let grandRow = `<tr class="grand-total-row">
+      <td style="width:50px;"></td><td style="width:120px;"></td><td style="width:220px;"><strong style="color:#60a5fa;">★ GRAND TOTAL</strong></td><td style="width:80px;">INR</td>` +
+      comps.map((c, idx) => {
+        let intVal = idx === 0 ? 50000 : 47000;
+        let extVal = 20000;
+        return `<td class="highlight-cell" onmouseenter="showTip(event, 'Part_Formation_Line__c', 'Column_Grand_Total_Cost__c', 'Formula: Internal + External', 'Total for ${c.name} = ${intVal} + ${extVal}')">${intVal + extVal}</td>`;
+      }).join('') +
+      `<td class="highlight-cell" style="background:#2563eb !important; color:#fff;" onmouseenter="showTip(event, 'RFQ_Part__c', 'Grand_Total_Testing_Cost__c', 'Formula: Total_Internal_Testing_Cost__c + Total_External_Testing_Cost__c', 'Combined overall Grand Total')">${(50000 + (comps.length - 1) * 47000) + (comps.length * 20000)} <span class="tag" style="background:#fff; color:#2563eb;">FINAL</span></td></tr>`;
+
+    document.getElementById('grandTable').innerHTML = `<tbody>${grandRow}</tbody>`;
+
+    // Attach leave listeners
+    document.querySelectorAll('.highlight-cell').forEach(cell => {
+      cell.addEventListener('mouseleave', () => { tipBox.style.display = 'none'; });
+    });
+  }
+
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  // Initial render
+  renderAllTables();
+</script>
+
+</body>
+</html>

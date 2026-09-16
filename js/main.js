@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
       row.className = "module-row";
       row.innerHTML = `
         <div class="module-node">${String(m.id).padStart(2, "0")}</div>
-        <article class="module-card" data-href="modules/module-${m.id}.html" role="link" tabindex="0"
+        <article class="module-card" data-href="modules/module.html?m=${m.id}" role="link" tabindex="0"
                  aria-label="Open Module ${m.id}: ${m.name}">
           <div class="mc-top">
             <div class="mc-ico">${m.icon}</div>

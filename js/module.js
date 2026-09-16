@@ -1,12 +1,18 @@
 /* ============================================================
-   Module detail pages — renders journey from MODULES data
-   Reads: <body data-module="N">
+   Module detail page — renders journey from MODULES data
+   One shared shell (modules/module.html) for every module and
+   sub-module; reads which one to show from the URL query string:
+     modules/module.html?m=3        → Module 3 overview
+     modules/module.html?m=3&s=2    → Module 3, Sub-Module 2
    ============================================================ */
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  const id = parseInt(document.body.dataset.module, 10);
-  const subId = document.body.dataset.sub ? parseInt(document.body.dataset.sub, 10) : null;
+  const params = new URLSearchParams(window.location.search);
+  const idRaw = params.get("m") || document.body.dataset.module;
+  const subRaw = params.get("s") || document.body.dataset.sub;
+  const id = parseInt(idRaw, 10);
+  const subId = subRaw ? parseInt(subRaw, 10) : null;
   const mod = MODULES.find(m => m.id === id);
   if (!mod) return;
   const sub = subId && mod.submodules ? mod.submodules.find(s => s.id === subId) : null;
@@ -15,6 +21,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document.title = sub
     ? `M${pad(id)}.${subId} — ${sub.name} | Creatique × Polyplastics`
     : `Module ${pad(id)} — ${mod.name} | Creatique × Polyplastics`;
+
+  /* ---------- Footer tag + back link (shared across all module page types) ---------- */
+  const footTag = document.getElementById("footModuleTag");
+  if (footTag) {
+    footTag.textContent = sub
+      ? `Module ${id} - ${mod.name} - Sub-Module ${subId} of ${mod.submodules.length}`
+      : `Lead to Invoice - Module ${id} of ${MODULES.length}`;
+  }
+  const backCta = document.getElementById("backCta");
+  if (backCta && sub) {
+    backCta.textContent = `Back to ${mod.name} Sub-Modules`;
+    backCta.href = `module.html?m=${id}`;
+  }
 
   /* ---------- Sticky header ---------- */
   const header = document.querySelector(".site-header");
@@ -37,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ---------- Hero ---------- */
   const hero = document.getElementById("moduleHero");
   const crumbMid = sub
-    ? `<a href="module-${id}.html">Module ${pad(id)} · ${mod.name}</a><span>/</span><span>Sub-Module ${subId} of ${mod.submodules.length}</span>`
+    ? `<a href="module.html?m=${id}">Module ${pad(id)} · ${mod.name}</a><span>/</span><span>Sub-Module ${subId} of ${mod.submodules.length}</span>`
     : `<span>Module ${pad(id)} of ${pad(MODULES.length)}</span>`;
   const heroStats = sub
     ? `<div class="mh-stat"><b>${pad(sub.cycle.length)}</b><small>Cycle Stages</small></div>
@@ -130,11 +149,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const pSub = mod.submodules.find(s => s.id === subId - 1);
     const nSub = mod.submodules.find(s => s.id === subId + 1);
     nav.innerHTML = `
-      <a class="prev ${pSub ? "" : "disabled"}" href="${pSub ? `module-${id}-sub-${pSub.id}.html` : "#"}">
+      <a class="prev ${pSub ? "" : "disabled"}" href="${pSub ? `module.html?m=${id}&s=${pSub.id}` : "#"}">
         <span class="nav-label">← Previous Sub-Module</span>
         <span class="nav-title">${pSub ? `${id}.${pSub.id} · ${pSub.name}` : "Start of module"}</span>
       </a>
-      <a class="next ${nSub ? "" : "disabled"}" href="${nSub ? `module-${id}-sub-${nSub.id}.html` : "#"}">
+      <a class="next ${nSub ? "" : "disabled"}" href="${nSub ? `module.html?m=${id}&s=${nSub.id}` : "#"}">
         <span class="nav-label">Next Sub-Module →</span>
         <span class="nav-title">${nSub ? `${id}.${nSub.id} · ${nSub.name}` : "End of sub-modules"}</span>
       </a>`;
@@ -160,11 +179,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const prevM = MODULES.find(m => m.id === id - 1);
     const nextM = MODULES.find(m => m.id === id + 1);
     nav.innerHTML = `
-      <a class="prev ${prevM ? "" : "disabled"}" href="${prevM ? `module-${prevM.id}.html` : "#"}">
+      <a class="prev ${prevM ? "" : "disabled"}" href="${prevM ? `module.html?m=${prevM.id}` : "#"}">
         <span class="nav-label">← Previous Module</span>
         <span class="nav-title">${prevM ? `${pad(prevM.id)} · ${prevM.name}` : "Start of journey"}</span>
       </a>
-      <a class="next ${nextM ? "" : "disabled"}" href="${nextM ? `module-${nextM.id}.html` : "#"}">
+      <a class="next ${nextM ? "" : "disabled"}" href="${nextM ? `module.html?m=${nextM.id}` : "#"}">
         <span class="nav-label">Next Module →</span>
         <span class="nav-title">${nextM ? `${pad(nextM.id)} · ${nextM.name}` : "End of journey — Invoice"}</span>
       </a>`;
@@ -178,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const grid = document.createElement("div");
     grid.className = "sub-grid";
     grid.innerHTML = mod.submodules.map(s => `
-      <a class="sub-card" href="module-${id}-sub-${s.id}.html">
+      <a class="sub-card" href="module.html?m=${id}&s=${s.id}">
         <div class="sub-num">${id}.${s.id}</div>
         <div class="sub-ico">${s.icon}</div>
         <h3>${s.name}</h3>
@@ -191,11 +210,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const prevM = MODULES.find(m => m.id === id - 1);
     const nextM = MODULES.find(m => m.id === id + 1);
     nav.innerHTML = `
-      <a class="prev ${prevM ? "" : "disabled"}" href="${prevM ? `module-${prevM.id}.html` : "#"}">
+      <a class="prev ${prevM ? "" : "disabled"}" href="${prevM ? `module.html?m=${prevM.id}` : "#"}">
         <span class="nav-label">← Previous Module</span>
         <span class="nav-title">${prevM ? `${pad(prevM.id)} · ${prevM.name}` : "Start of journey"}</span>
       </a>
-      <a class="next ${nextM ? "" : "disabled"}" href="${nextM ? `module-${nextM.id}.html` : "#"}">
+      <a class="next ${nextM ? "" : "disabled"}" href="${nextM ? `module.html?m=${nextM.id}` : "#"}">
         <span class="nav-label">Next Module →</span>
         <span class="nav-title">${nextM ? `${pad(nextM.id)} · ${nextM.name}` : "End of journey — Invoice"}</span>
       </a>`;
@@ -242,11 +261,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const prev = MODULES.find(m => m.id === id - 1);
   const next = MODULES.find(m => m.id === id + 1);
   nav.innerHTML = `
-    <a class="prev ${prev ? "" : "disabled"}" href="${prev ? `module-${prev.id}.html` : "#"}">
+    <a class="prev ${prev ? "" : "disabled"}" href="${prev ? `module.html?m=${prev.id}` : "#"}">
       <span class="nav-label">← Previous Module</span>
       <span class="nav-title">${prev ? `${pad(prev.id)} · ${prev.name}` : "Start of journey"}</span>
     </a>
-    <a class="next ${next ? "" : "disabled"}" href="${next ? `module-${next.id}.html` : "#"}">
+    <a class="next ${next ? "" : "disabled"}" href="${next ? `module.html?m=${next.id}` : "#"}">
       <span class="nav-label">Next Module →</span>
       <span class="nav-title">${next ? `${pad(next.id)} · ${next.name}` : "End of journey — Invoice"}</span>
     </a>`;

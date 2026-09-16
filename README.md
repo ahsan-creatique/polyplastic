@@ -17,6 +17,18 @@ A comprehensive digital transformation proposal by **Creatique Technologies** fo
 
 ---
 
+## ✏️ Editing the Content (No Coding Required)
+
+Every module, sub-module and step shown on the site is driven by one
+plain-text file: **[`js/modules-content.js`](js/modules-content.js)**.
+A Business Analyst can open it in Notepad, edit the wording, add a new
+step / sub-module / whole module, save, and refresh the site — no HTML,
+CSS or JavaScript knowledge needed, and no new files to create.
+
+**See [`BA-CONTENT-GUIDE.md`](BA-CONTENT-GUIDE.md) for the full how-to.**
+
+---
+
 ## 🎯 The Complete Journey Flow
 
 ```
@@ -220,34 +232,29 @@ The bridge completing lead-to-invoice — bi-directional SAP synchronization.
 ```
 polyplastic/
 ├── README.md                    # Project documentation
+├── BA-CONTENT-GUIDE.md          # How BAs edit module/step content — no coding
 ├── index.html                   # Landing page with journey path
 ├── css/
-│   └── theme.css                # Complete styling (28.7 KB)
+│   └── theme.css                # Complete styling
 ├── js/
-│   ├── data.js                  # Module data & journey configuration (43.3 KB)
+│   ├── modules-content.js       # ← BA-EDITABLE plain-text content (all modules/steps)
+│   ├── content-parser.js        # Turns modules-content.js into the MODULES array
 │   ├── main.js                  # Landing page logic & animations
 │   └── module.js                # Module page rendering
 └── modules/
-    ├── module-1.html            # Lead & Pre-RFQ Management
-    ├── module-2.html            # Account & Contact Management
-    ├── module-3.html            # RFQ Configuration
-    ├── module-3-sub-1.html      # RFQ Registration
-    ├── module-3-sub-2.html      # Product Requirement
-    ├── module-3-sub-3.html      # Polyplastics Server Integration
-    ├── module-3-sub-4.html      # Product Feasibility
-    ├── module-3-sub-5.html      # Supplier Inputs
-    ├── module-3-sub-6.html      # Tooling Feasibility
-    ├── module-3-sub-7.html      # Product Costing & Margins
-    ├── module-3-sub-8.html      # PDF Generation
-    ├── module-4.html            # Quotation & Approval
-    ├── module-5.html            # Development Order
-    ├── module-6.html            # BOM & LOT Management
-    ├── module-7.html            # NPD Project Management
-    ├── module-8.html            # Packaging Module
-    ├── module-9.html            # Change Management (ECN)
-    ├── module-10.html           # SAP Integration
-    └── rfq-ui-template.html     # Interactive RFQ UI Template (427 KB)
+    ├── module.html               # Single dynamic page for every module & sub-module
+    │                              #   ?m=<id>          → module overview
+    │                              #   ?m=<id>&s=<subId> → sub-module page
+    ├── module-1.html … module-10.html,
+    │   module-3-sub-1.html … module-3-sub-8.html
+    │                              # Redirect stubs → module.html?m=…  (old bookmarks)
+    └── rfq-ui-template.html     # Interactive RFQ UI Template
 ```
+
+Adding a new module or sub-module is a content-only change — see
+[`BA-CONTENT-GUIDE.md`](BA-CONTENT-GUIDE.md). `modules/module.html` builds
+the page for any module/sub-module id present in `js/modules-content.js`,
+so no new HTML file ever needs to be created by hand.
 
 ---
 
@@ -320,12 +327,17 @@ polyplastic/
 
 ## 📊 Data Structure
 
-The `js/data.js` file contains the complete module configuration:
+The `js/modules-content.js` file — a plain-text, BA-editable format — is
+the single source of truth for:
 - Module metadata (id, icon, name, description)
 - Phase-by-phase journey steps with outcomes
-- Sub-module definitions for Module 3
-- Feature lists for each step
-- Branching logic for approval paths
+- Sub-module definitions (Module 3 today; any module can have sub-modules)
+- Feature/chip lists for each step
+- Branching logic for approval paths, and buttons/links
+
+`js/content-parser.js` parses it into the `MODULES` array at page-load
+time. See [`BA-CONTENT-GUIDE.md`](BA-CONTENT-GUIDE.md) for the field
+reference and edit instructions.
 
 ---
 
@@ -389,7 +401,8 @@ Module 5: Development Order
 
 - **Landing Page:** `index.html`
 - **Module Template:** `modules/rfq-ui-template.html`
-- **Source Data:** `js/data.js` (all module configurations)
+- **Content (edit this):** `js/modules-content.js` — see `BA-CONTENT-GUIDE.md`
+- **Content Parser:** `js/content-parser.js` (turns the text file into `MODULES`)
 - **Main Logic:** `js/main.js` (hero animations & journey rendering)
 - **Module Rendering:** `js/module.js` (module page logic)
 
