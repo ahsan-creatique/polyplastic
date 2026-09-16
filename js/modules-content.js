@@ -274,6 +274,19 @@ MODULE 3
     END CYCLE
 
     CYCLE
+      Icon: 🛠️
+      Actor: Engineering Team
+      Title: Tooling Feasibility
+      Text: Engineering cross-verifies tooling feasibility across part assembly components — configuring the process-wise list of tooling (molds, cooling fixtures, checking fixtures, masking jigs) and component material specifications.
+      Chips:
+        - List of Tooling per Component
+        - Tooling Construction & Material Information
+        - Cavity, Mold Size & Mold Weight Assessment
+      Links:
+        - ../lightning-modules/rfq-configuration/index.html?tab=tooling-feasibility | Open Tooling Feasibility UI
+    END CYCLE
+
+    CYCLE
       Icon: 🖥️
       Actor: Live Screen
       Title: RFQ Registration UI Template
@@ -281,6 +294,7 @@ MODULE 3
       Links:
         - rfq-ui-template.html | Old UI Template | secondary
         - ../lightning-modules/rfq-configuration/index.html | Open RFQ Configuration Template
+        - ../lightning-modules/rfq-configuration/index.html?tab=tooling-feasibility | Open Tooling Feasibility UI
     END CYCLE
 
   END SUBMODULE
@@ -489,6 +503,15 @@ MODULE 3
       Text: Rakesh Sir takes the final decision on the Opportunity.
       Branch OK: Approved | A notification and approval are sent to the Costing team for adding the production cost — the journey continues in Sub-Module 3.7 Internal Product Costing & Margins.
       Branch NO: Rejected | Ravi Sir and the Engineering Associate receive a rejection notification.
+    END CYCLE
+
+    CYCLE
+      Icon: 🖥️
+      Actor: Live Screen
+      Title: Tooling Feasibility UI
+      Text: Experience the actual Tooling Feasibility interface — with the interactive List of Tooling, component quantities, and Tooling Construction specifications.
+      Links:
+        - ../lightning-modules/rfq-configuration/index.html?tab=tooling-feasibility | Open Tooling Feasibility UI
     END CYCLE
 
   END SUBMODULE

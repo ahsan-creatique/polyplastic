@@ -255,6 +255,12 @@ window.RFQConfig = window.RFQConfig || {};
     return null;
   };
 
+  var urlParams = typeof window !== "undefined" && window.location && window.location.search
+    ? new URLSearchParams(window.location.search)
+    : null;
+  var initialTab = urlParams && urlParams.get("tab") ? urlParams.get("tab") : "process-feasibility";
+  var initialToolingSubTab = urlParams && urlParams.get("subtab") ? urlParams.get("subtab") : "tooling-process-quantity";
+
   RFQConfig.state = {
     roleId: RFQConfig.ROLES[0].id,
     fields: initialFields(),
@@ -280,8 +286,8 @@ window.RFQConfig = window.RFQConfig || {};
     // Raw Material Cost / Process Cost are rolled up from each
     // component's Part Configuration levels instead of stored here.
     totalPartCost: { forwarding: {}, overheadPct: {}, profitPct: {} },
-    assemblyTab: "process-feasibility",
-    toolingSubTab: "tooling-process-quantity",
+    assemblyTab: initialTab,
+    toolingSubTab: initialToolingSubTab,
     designDevSubTab: "design-development-feasibility",
     costingSubTab: "total-part-cost",
     // Data URL of the uploaded part photo, or the default placeholder photo
@@ -349,4 +355,13 @@ window.RFQConfig = window.RFQConfig || {};
   };
 
   RFQConfig.renderApp();
+
+  if (urlParams && urlParams.get("tab")) {
+    setTimeout(function () {
+      var tabsSection = document.querySelector(".sf-assembly-tabs");
+      if (tabsSection) {
+        tabsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 150);
+  }
 })(window.RFQConfig, window.LM);
