@@ -138,7 +138,7 @@ window.RFQConfig = window.RFQConfig || {};
     var head = el("div", { class: "sf-section__head sf-section__head--sub" }, [
       el("div", { class: "sf-section__title" }, [
         el("div", { class: "sf-section__bar" }),
-        el("h2", {}, ["LOT Information"])
+        el("h2", {}, ["PPAP Activities"])
       ])
     ]);
 
